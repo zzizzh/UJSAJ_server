@@ -1,4 +1,10 @@
 /DB/
+<<<<<<< HEAD
 /ProblemDomain/
 /PhysicalArchitecture/
+=======
+/Implement/
+/PhysicalArchitecture/
+/ProblemDomain/
+>>>>>>> master
 /test/
