@@ -1,216 +1,95 @@
 package test;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
-import Foundation.CbookList;
-import Foundation.roomList;
+import Foundation.PostsList;
+import ProblemDomain.Posts;
 import ProblemDomain.User;
 
+/*
+ * 클라이언트에서 필요한 데이터를 관리하는 클래스
+ * 7.22 지재민
+ */
 public class ClientControl {
 
-	private ArrayList<roomList> RList;
-	private ArrayList<String> SList;
-	private ArrayList<User> UList;
-	private ArrayList<CbookList> BList;
-	private ArrayList<String> bookResult;
+	private ArrayList<Posts> timeLine;		// timeLine에 보일 Posts리스트
+	private ArrayList<Posts> myPostsList;	// 내가 쓴 Posts 리스트
+	private ArrayList<Posts> myLikeList;	// 내가 좋아요 한 Posts 리스트
+	private ArrayList<String> stringList;	// 통신 관련 string 리스트
+	
+	private User me;						// 현재 로그인 유저 정보
 	
 	
+	/*
+	 * 기본 생성자
+	 * ArrayList만 초기화
+	 */
 	public ClientControl()
 	{
-		RList=new ArrayList<roomList>();
-		SList=new ArrayList<String>();
-		UList=new ArrayList<User>();
-		BList=new ArrayList<CbookList>();
-		bookResult=new ArrayList<String>();
+		timeLine=new ArrayList<Posts>();
+		myPostsList=new ArrayList<Posts>();
+		stringList=new ArrayList<String>();
+		
+		me = null;
 	}	
-	public void addRoomList(roomList roomlist)
+	
+	/*
+	 * 서버에서 받아온 타임라인에 보일 PostsList를 저장.
+	 */
+	public void addTimeLine(PostsList postsList)
 	{
-		RList.add(roomlist);
+		timeLine.addAll(postsList.getAll());
 	}
+
+	/*
+	 * 서버에서 받아온 나의 PostsList를 저장.
+	 */
+	public void setMyPostsList(PostsList postsList)
+	{
+		myPostsList.addAll(postsList.getAll());
+	}
+	/*
+	 * 내가 쓴 글을 MyPostsList에 저장.
+	 */
+	public void addMyPostsList(Posts posts)
+	{
+		myPostsList.add(posts);
+	}
+	
+	/*
+	 * 서버에서 받아온 내가 좋아요 한 PostsList를 저장.
+	 */
+	public void setLikeList(PostsList postsList)
+	{
+		myLikeList.addAll(postsList.getAll());
+	}
+	/*
+	 * 내가 좋아요 한 글을 PostsList에 저장.
+	 */
+	public void addLikeList(Posts posts)
+	{
+		myLikeList.add(posts);
+	}
+	
+	
 	public void addString(String string)
 	{
-		SList.add(string);
+		stringList.add(string);
 	}
-	public void addBookResult(String result)
+
+	public void setMe(User user)
 	{
-		bookResult.add(result);
+		me = user;
 	}
-	public void addUser(User user)
-	{
-		UList.add(user);
-	}
-	public void addBookList(CbookList booklist)
-	{
-		BList.add(booklist);
-	}
-	public Object getResponse()
-	{
-		int num=1;
-		System.out.println();
-		while(true)
-		{
-			try {
-				System.out.print(num+" ");
-				num++;
-				Thread.sleep(10);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			
-			if(!SList.isEmpty())
-			{
-				System.out.println();
-				String string=SList.get(0);
-				SList.remove(0);
-				return string;
-			}
-			if(!RList.isEmpty())
-			{
-				System.out.println();
-				roomList list=RList.get(0);
-				RList.remove(0);
-				return list;
-			}
-			if(!UList.isEmpty())
-			{
-				System.out.println();
-				User user=UList.get(0);
-				UList.remove(0);
-				System.out.println();
-				return user;
-			}
-		}
-		
-	}
-	public CbookList getBookListResponce()
-	{
-		int num=1;
-		System.out.println();
-		while(true)
-		{
-			try {
-				
-				System.out.print(num+" ");
-				num++;
-				Thread.sleep(10);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			
-			if(!BList.isEmpty())
-			{
-				CbookList list=BList.get(0);
-				BList.remove(0);
-				System.out.println();
-				return list;
-			}
-		}
-		
-	}
-	public String getStringResponce()
-	{
-		int num=1;
-		System.out.println();
-		while(true)
-		{
-			try {
-				;
-				System.out.print(num+" ");
-				num++;
-				Thread.sleep(10);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			
-			if(!SList.isEmpty())
-			{
-				System.out.println();
-				String string=SList.get(0);
-				SList.remove(0);
-				return string;
-			}			
-		}
-	}
-	public roomList getRoomListResponce()
-	{
-		int num=1;
-		System.out.println();
-		while(true)
-		{
-			try {
-				
-				System.out.print(num+" ");
-				num++;
-				Thread.sleep(10);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			if(!RList.isEmpty())
-			{
-				System.out.println();
-				roomList list=RList.get(0);
-				RList.remove(0);
-				return list;
-			}
-		}
-	}
-	public boolean getBookResponce()
-	{
-		int num=1;
-		System.out.println();
-		while(true)
-		{
-			try {
-				System.out.print(num+" ");
-				num++;
-				Thread.sleep(10);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			if(!bookResult.isEmpty())
-			{
-				System.out.println();
-				String result=bookResult.get(0);
-				RList.remove(0);
-				if(result.equals("BOOK"))
-					return true;
-				if(result.equals("FAIL"))
-					return false;
-			}
-		}
-	}
-	public User getUserResponce()
-	{
-		int num=1;
-		System.out.println();
-		while(true)
-		{
-			try {
-				System.out.print(num+" ");
-				num++;
-				Thread.sleep(10);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			if(!UList.isEmpty())
-			{
-				System.out.println();
-				User user=UList.get(0);
-				UList.remove(0);
-				return user;
-			}
-		}
-	}
+	
 	public void resetAll()
 	{
-		RList=new ArrayList<roomList>();
-		SList=new ArrayList<String>();
-		UList=new ArrayList<User>();
+		stringList=new ArrayList<String>();
+		timeLine=new ArrayList<Posts>();
+		myPostsList=new ArrayList<Posts>();
+		stringList=new ArrayList<String>();
+		
+		me = null;
 	}
 }

@@ -21,8 +21,7 @@ public class Server extends Thread// ＆서버오픈클래스
 	private int port;
 	private int clientNumber;
 	private static ArrayList<EchoThread> clientList;
-	private DBManager dbManager;
-	
+
 	public Server(int port) {
 		clientList = new ArrayList<EchoThread>();
 		this.port = port;
@@ -65,6 +64,8 @@ class EchoThread extends Thread { // ＆클라이언트간 멀티쓰레드 구현
 	private Socket sock;
 	private int clientNumber;
 
+	private DBManager dbManager;
+	
 	ObjectOutputStream serverOutputStream;
 	OutputStream out;
 	InputStream in;
@@ -129,18 +130,18 @@ class EchoThread extends Thread { // ＆클라이언트간 멀티쓰레드 구현
 	{
 		StringTokenizer token = new StringTokenizer(msg, "#");
 		
-		if (msg.startsWith("login")) {
-			String pw = dbManager.getPWbyID(token.nextToken());
+		if (msg.startsWith("#login")) {
+			String pw = dbManager.getPWByID(token.nextToken());
 			if (pw.equals(token.nextToken()))
-				sendToClientString("success");
+				sendToClientString("#success");
 			else
-				sendToClientString("false");
+				sendToClientString("#false");
 		}
-		else if (msg.startsWith("regist")) {
-			if (dbManager.getPWbyID(token.nextToken()) != null)
-				sendToClientString("success");
+		else if (msg.startsWith("#regist")) {
+			if (dbManager.getPWByID(token.nextToken()) != null)
+				sendToClientString("#success");
 			else 
-				sendToClientString("false");
+				sendToClientString("#false");
 			
 		}
 		/*} else if (msg.startsWith("#login")) {
