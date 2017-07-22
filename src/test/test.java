@@ -1,11 +1,16 @@
 package test;
+import java.io.File;
 import java.util.Scanner;
-import DB.*;
-import ProblemDomain.*;
+
+import javax.imageio.stream.FileImageOutputStream;
+
+import DB.DBManager;
+import ProblemDomain.Posts;
+import ProblemDomain.User;
 
 public class test {
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception {
 		// TODO Auto-generated method stub
 		DBManager d = new DBManager();
 
@@ -41,6 +46,20 @@ public class test {
 			id = keyboard.next();
 
 		}
+		
+		int postsIndex = d.postsIndex;
+		
+		Posts p = new Posts(postsIndex);
+	
+		File image = new File("C:\\Users\\안준영\\Desktop\\DSC00565.jpg");
+		p.setImage(image);
+		
+		d.insertPosts(p);
+		
+		byte[] buffer = d.getImageByIndex(1);
+		FileImageOutputStream imageOutput = new FileImageOutputStream(new File("C:\\Users\\안준영\\Desktop\\DSC00565new.jpg"));
+        imageOutput.write(buffer, 0, buffer.length);
+        imageOutput.close();
 
 	}
 

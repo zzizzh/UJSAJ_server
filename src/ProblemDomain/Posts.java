@@ -1,9 +1,11 @@
 package ProblemDomain;
 
 import java.awt.Image;
+import java.io.File;
 
 public class Posts {
 
+	int index;
 	Location locationInfo;
 	String url;
 	String artist;
@@ -14,7 +16,35 @@ public class Posts {
 	int like;
 	
 	long createTime;
-	Image image;
+	File image;
+	
+	public Posts(){
+		this.index = 0;
+		this.locationInfo = null;
+		this.url = null;
+		this.artist = null;
+		this.song = null;
+		this.postsID = 0;
+		this.like = 0;
+		this.createTime = 0;
+		this.image = null;
+	}
+	
+	public Posts(int index){
+		this.index = index;
+		this.locationInfo = null;
+		this.url = null;
+		this.artist = null;
+		this.song = null;
+		this.postsID = 0;
+		this.like = 0;
+		this.createTime = 0;
+		this.image = null;
+	}
+	
+	public int getPostsIndex(){
+		return index;
+	}
 	public Location getLocationInfo() {
 		return locationInfo;
 	}
@@ -63,12 +93,15 @@ public class Posts {
 	public void setCreateTime(long createTime) {
 		this.createTime = createTime;
 	}
-	public Image getImage() {
+	
+	public String getFileName(){
+		return Integer.toString(index);
+	}	
+	public File getImage(){
 		return image;
 	}
-	public void setImage(Image image) {
+	public void setImage(File image){
 		this.image = image;
 	}
-	
 	
 }

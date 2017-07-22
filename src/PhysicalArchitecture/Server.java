@@ -1,6 +1,7 @@
 package PhysicalArchitecture;
 
 import java.io.BufferedReader;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -14,14 +15,13 @@ import java.util.ArrayList;
 import java.util.StringTokenizer;
 
 import DB.DBManager;
-
-public class Server extends Thread// £¦¼­¹ö¿ÀÇÂÅ¬·¡½º
+import DB.*;
+public class Server extends Thread// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Å¬ï¿½ï¿½ï¿½ï¿½
 {
 	private ServerSocket server;
 	private int port;
 	private int clientNumber;
 	private static ArrayList<EchoThread> clientList;
-	private DBManager dbManager;
 	
 	public Server(int port) {
 		clientList = new ArrayList<EchoThread>();
@@ -32,18 +32,18 @@ public class Server extends Thread// £¦¼­¹ö¿ÀÇÂÅ¬·¡½º
 	public void run() {
 		try {
 			server = new ServerSocket(port);
-			System.out.println("Á¢¼ÓÀ» ±â´Ù¸³´Ï´Ù.");
+			System.out.println("ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ù¸ï¿½ï¿½Ï´ï¿½.");
 
 			while (true) {
 
-				Socket sock = server.accept(); // Á¢¼Ó ´ë±â
+				Socket sock = server.accept(); // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
 
-				EchoThread echothread = new EchoThread(sock, clientNumber++); // Å¬¶óÀÌ¾ðÆ®
-																				// Á¢¼Ó
-																				// ½Ã
-																				// ½ÇÇàµÇ¸ç
-				// echoThread »ý¼º
-				echothread.start(); // run()¸Þ¼Òµå ½ÇÇà
+				EchoThread echothread = new EchoThread(sock, clientNumber++); // Å¬ï¿½ï¿½ï¿½Ì¾ï¿½Æ®
+																				// ï¿½ï¿½ï¿½ï¿½
+																				// ï¿½ï¿½
+																				// ï¿½ï¿½ï¿½ï¿½Ç¸ï¿½
+				// echoThread ï¿½ï¿½ï¿½ï¿½
+				echothread.start(); // run()ï¿½Þ¼Òµï¿½ ï¿½ï¿½ï¿½ï¿½
 
 				System.out.println("ActiveCount : " + EchoThread.activeCount);
 				clientList.add(echothread);
@@ -58,7 +58,7 @@ public class Server extends Thread// £¦¼­¹ö¿ÀÇÂÅ¬·¡½º
 	}
 }
 
-class EchoThread extends Thread { // £¦Å¬¶óÀÌ¾ðÆ®°£ ¸ÖÆ¼¾²·¹µå ±¸Çö
+class EchoThread extends Thread { // ï¿½ï¿½Å¬ï¿½ï¿½ï¿½Ì¾ï¿½Æ®ï¿½ï¿½ ï¿½ï¿½Æ¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 	private ArrayList<EchoThread> clientList;
 	static int activeCount = 0;
 
@@ -70,13 +70,14 @@ class EchoThread extends Thread { // £¦Å¬¶óÀÌ¾ðÆ®°£ ¸ÖÆ¼¾²·¹µå ±¸Çö
 	InputStream in;
 	PrintWriter pw;
 	BufferedReader br;
-
+	DBManager dbManager;
+	
 	public EchoThread(Socket sock, int clientNumber) {
 		this.sock = sock;
-		activeCount++; // ÇØ´ç Å¬·¹½º »ý¼º ½Ã °ª Áõ°¡
+		activeCount++; // ï¿½Ø´ï¿½ Å¬ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 		this.clientNumber = clientNumber;
 		Server.getEchoThreadList();
-	} // »ý¼ºÀÚ
+	} // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 	public int getClientNumber() {
 		return clientNumber;
@@ -86,19 +87,19 @@ class EchoThread extends Thread { // £¦Å¬¶óÀÌ¾ðÆ®°£ ¸ÖÆ¼¾²·¹µå ±¸Çö
 		return serverOutputStream;
 	}
 
-	public void run() { // start() ½ÇÇà ½Ã È£Ãâ
-		try { // I/O µî ±â´É ±¸Çö
+	public void run() { // start() ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ È£ï¿½ï¿½
+		try { // I/O ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 			InetAddress inetaddr = sock.getInetAddress();
-			System.out.println(inetaddr.getHostAddress() + " ·ÎºÎÅÍ Á¢¼ÓÇÏ¿´½À´Ï´Ù.");
-			serverOutputStream = new ObjectOutputStream(sock.getOutputStream());// £¦Å¬¶óÀÌ¾ðÆ®·Î	º¸³»´Â   object½ºÆ®¸²
-			in = sock.getInputStream();// £¦Å¬¶óÀÌ¾ðÆ®·ÎºÎÅÍ ¹Þ´Â strign½ºÆ®¸²
+			System.out.println(inetaddr.getHostAddress() + " ï¿½Îºï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï¿ï¿½ï¿½ï¿½ï¿½Ï´ï¿½.");
+			serverOutputStream = new ObjectOutputStream(sock.getOutputStream());// ï¿½ï¿½Å¬ï¿½ï¿½ï¿½Ì¾ï¿½Æ®ï¿½ï¿½	ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½   objectï¿½ï¿½Æ®ï¿½ï¿½
+			in = sock.getInputStream();// ï¿½ï¿½Å¬ï¿½ï¿½ï¿½Ì¾ï¿½Æ®ï¿½Îºï¿½ï¿½ï¿½ ï¿½Þ´ï¿½ strignï¿½ï¿½Æ®ï¿½ï¿½
 			br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
 
 			String line = null;
 
 			while ((line = br.readLine()) != null) {
-				// ¾î´À Å¬¶óÀÌ¾ðÆ®°¡ º¸³Â´ÂÁö È®ÀÎ ÇÒ ¼ö ÀÖ³ª?
-				System.out.println("Å¬¶óÀÌ¾ðÆ®·Î ºÎÅÍ Àü¼Û¹ÞÀº ¹®ÀÚ¿­ : " + line);
+				// ï¿½ï¿½ï¿½ Å¬ï¿½ï¿½ï¿½Ì¾ï¿½Æ®ï¿½ï¿½ ï¿½ï¿½ï¿½Â´ï¿½ï¿½ï¿½ È®ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ ï¿½Ö³ï¿½?
+				System.out.println("Å¬ï¿½ï¿½ï¿½Ì¾ï¿½Æ®ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Û¹ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ú¿ï¿½ : " + line);
 				handleMeg(line);
 			}
 
@@ -106,7 +107,7 @@ class EchoThread extends Thread { // £¦Å¬¶óÀÌ¾ðÆ®°£ ¸ÖÆ¼¾²·¹µå ±¸Çö
 			sock.close();
 			activeCount--;
 			clientList = Server.getEchoThreadList();
-			for (int i = 0; i < clientList.size(); i++)// £¦Å¬¶óÀÌ¾ðÆ®°¡ Å»¶ô½Ã ÇØ´ç Å¬¶óÀÌ¾ðÆ®Ã£¾Æ¼­ »èÁ¦
+			for (int i = 0; i < clientList.size(); i++)// ï¿½ï¿½Å¬ï¿½ï¿½ï¿½Ì¾ï¿½Æ®ï¿½ï¿½ Å»ï¿½ï¿½ï¿½ï¿½ ï¿½Ø´ï¿½ Å¬ï¿½ï¿½ï¿½Ì¾ï¿½Æ®Ã£ï¿½Æ¼ï¿½ ï¿½ï¿½ï¿½ï¿½
 			{
 				if (clientNumber == clientList.get(i).getClientNumber())
 					clientList.remove(i);
@@ -124,20 +125,20 @@ class EchoThread extends Thread { // £¦Å¬¶óÀÌ¾ðÆ®°£ ¸ÖÆ¼¾²·¹µå ±¸Çö
 		}
 	}
 
-	public void handleMeg(String msg)// £¦ Å¬¶óÀÌ¾ðÆ®·Î ºÎÅÍ ÀÔ·Â¹ÞÀ» ¸í·É¾î¸¦ ¼­¹ö¿¡¼­ Ã³¸®ÇÏ´Â ¸Þ¼Òµå
-	// ÅäÄ¿³ªÀÌÁî·Î ²÷¾î¼­ ±¸ÇöÇÒ °Í . ex #book"È¸ÀÇ½Ç30"´ë±¸ºÏ±¸"³ëÇý¼º"01049497193
+	public void handleMeg(String msg)// ï¿½ï¿½ Å¬ï¿½ï¿½ï¿½Ì¾ï¿½Æ®ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ô·Â¹ï¿½ï¿½ï¿½ ï¿½ï¿½É¾î¸¦ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Ã³ï¿½ï¿½ï¿½Ï´ï¿½ ï¿½Þ¼Òµï¿½
+	// ï¿½ï¿½Ä¿ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½î¼­ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ . ex #book"È¸ï¿½Ç½ï¿½30"ï¿½ë±¸ï¿½Ï±ï¿½"ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½"01049497193
 	{
 		StringTokenizer token = new StringTokenizer(msg, "#");
 		
 		if (msg.startsWith("login")) {
-			String pw = dbManager.getPWbyID(token.nextToken());
+			String pw = dbManager.getPWByID(token.nextToken());
 			if (pw.equals(token.nextToken()))
 				sendToClientString("success");
 			else
 				sendToClientString("false");
 		}
 		else if (msg.startsWith("regist")) {
-			if (dbManager.getPWbyID(token.nextToken()) != null)
+			if (dbManager.getPWByID(token.nextToken()) != null)
 				sendToClientString("success");
 			else 
 				sendToClientString("false");
@@ -157,7 +158,7 @@ class EchoThread extends Thread { // £¦Å¬¶óÀÌ¾ðÆ®°£ ¸ÖÆ¼¾²·¹µå ±¸Çö
 		
 	}
 
-	//@@ÇöÀç Å¬¶óÀÌ¾ðÆ®¿¡°Ô StringÀ» ³Ñ°ÜÁÖ´Â ÇÔ¼ö
+	//@@ï¿½ï¿½ï¿½ï¿½ Å¬ï¿½ï¿½ï¿½Ì¾ï¿½Æ®ï¿½ï¿½ï¿½ï¿½ Stringï¿½ï¿½ ï¿½Ñ°ï¿½ï¿½Ö´ï¿½ ï¿½Ô¼ï¿½
 	private void sendToClientString(String line) {
 		ObjectOutputStream temp = this.getOutput();
 		try {
