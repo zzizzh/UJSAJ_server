@@ -1,11 +1,18 @@
 package DB;
 
+import java.awt.Image;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Iterator;
+
+import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
+import javax.imageio.stream.ImageInputStream;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
@@ -212,14 +219,14 @@ public class DBManager {
 
 	}
 
-	public byte[] getImageByIndex(int index) throws Exception {
+	public Image getImageByIndex(int index) throws Exception {
 
 		Posts posts = new Posts();
 
 		GridFS gfsPhoto = new GridFS(db, "Image");
 
 		BasicDBObject idQuery = new BasicDBObject();
-		idQuery.put("Index", index);
+		idQuery.put("index", index);
 
 		DBCursor cursorId = postsCollection.find(idQuery);
 
@@ -229,9 +236,26 @@ public class DBManager {
 			if (check != null) {
 				
 				try(ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+					
 					GridFSDBFile imageForOutput = gfsPhoto.findOne(Integer.toString(index));
 					imageForOutput.writeTo(outputStream);
-					return outputStream.toByteArray();
+					
+					
+					BufferedImage bimage;
+					Image newImage;
+					
+					 ImageInputStream iis = ImageIO.createImageInputStream(new ByteArrayInputStream(outputStream.toByteArray()));
+			         Iterator<ImageReader> iter=ImageIO.getImageReaders(iis);
+			         if (iter.hasNext()) {
+			             ImageReader reader = (ImageReader)iter.next();
+			             reader.setInput(iis);
+			         }
+			         bimage = ImageIO.read(new ByteArrayInputStream(outputStream.toByteArray()));
+			         
+			         newImage = (Image)bimage;
+			         
+			         return newImage;
+					
 				  } catch(IOException e) {
 				    throw new Exception("Cannot retrieve content of gridFsFile [" + index + "]", e);
 				  }		

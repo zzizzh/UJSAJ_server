@@ -1,8 +1,15 @@
 package test;
+
+import java.awt.Image;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.util.Iterator;
 import java.util.Scanner;
 
-import javax.imageio.stream.FileImageOutputStream;
+import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
+import javax.imageio.stream.ImageInputStream;
 
 import DB.DBManager;
 import ProblemDomain.Posts;
@@ -47,19 +54,38 @@ public class test {
 
 		}
 		
-		int postsIndex = d.postsIndex;
+
+		Posts p1 = new Posts(d.postsIndex);		
+		File image1 = new File("C:\\Users\\안준영\\Desktop\\DSC00565.jpg");
+		p1.setImage(image1);
+		d.insertPosts(p1);
+				
+		Posts p2 = new Posts(d.postsIndex);
+		File image2 = new File("C:\\Users\\안준영\\Desktop\\KakaoTalk_20170713_001838256.jpg");
+		p2.setImage(image2);		
+		d.insertPosts(p2);		
 		
-		Posts p = new Posts(postsIndex);
-	
-		File image = new File("C:\\Users\\안준영\\Desktop\\DSC00565.jpg");
-		p.setImage(image);
+		Posts p3 = new Posts(d.postsIndex);
+		File image3 = new File("C:\\Users\\안준영\\Desktop\\IMG_9773.jpg");
+		p3.setImage(image3);		
+		d.insertPosts(p3);
 		
-		d.insertPosts(p);
+		byte[] chunk = d.getImageByIndex(1);
 		
-		byte[] buffer = d.getImageByIndex(1);
-		FileImageOutputStream imageOutput = new FileImageOutputStream(new File("C:\\Users\\안준영\\Desktop\\DSC00565new.jpg"));
-        imageOutput.write(buffer, 0, buffer.length);
-        imageOutput.close();
+		BufferedImage bimage;
+		Image newImage;
+		
+		 ImageInputStream iis = ImageIO.createImageInputStream(new ByteArrayInputStream(chunk));
+         Iterator<ImageReader> iter=ImageIO.getImageReaders(iis);
+         if (iter.hasNext()) {
+             ImageReader reader = (ImageReader)iter.next();
+             reader.setInput(iis);
+         }
+         bimage = ImageIO.read( new ByteArrayInputStream(chunk));
+         
+         newImage = (Image)bimage;
+         
+         ImageIO.write(bimage, "jpg", new File("C:\\Users\\안준영\\Desktop\\디비에서불러오기.jpg"));
 
 	}
 
