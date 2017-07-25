@@ -2,6 +2,14 @@ package ProblemDomain;
 
 import java.awt.Image;
 
+/**
+ * @author jm
+ * 
+ * Posts data writed by User
+ * Location 	: tour information
+ * url 			: youtube movie url
+ * artist		: 
+ */
 public class Posts {
 
 	Location locationInfo;

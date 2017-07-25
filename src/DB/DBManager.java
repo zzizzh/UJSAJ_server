@@ -14,7 +14,7 @@ public class DBManager {
 
 	public int userIndex;
 	int postsIndex;
-	String MongoDB_IP = "127.0.0.1";
+	String MongoDB_IP = "222.104.203.106";
 	int MongoDB_PORT = 27017;
 	String DB_NAME = "db";
 	
@@ -129,7 +129,4 @@ public class DBManager {
 		
 		
 	}
-	
-	
-	
 }
