@@ -13,7 +13,7 @@ import javax.imageio.stream.ImageInputStream;
 import DB.DBManager;
 import ProblemDomain.Posts;
 import ProblemDomain.User;
-
+import ProblemDomain.*;
 public class test {
 
 	public static void main(String[] args) throws Exception {
@@ -21,7 +21,20 @@ public class test {
 		DBManager d = new DBManager();
 
 		Scanner keyboard = new Scanner(System.in);
-
+		
+		Posts p = new Posts();
+		Location l = new Location();
+		
+		l.setBigLocation(1);
+		l.setMidLocation(1);
+		l.setSmallLocation(1);
+		
+		p.setLocationInfo(l);
+		
+		d.insertPosts(p);
+		
+		
+/*
 		String string = keyboard.next();
 		while (!(string.equals("quit"))) {
 
@@ -56,7 +69,7 @@ public class test {
 		File image1 = null;
 		p1.setFImage(image1);
 		d.insertPosts(p1);
-		
+		*/
 		
 		/*
 		Posts p1 = new Posts(d.postsIndex);		
@@ -64,11 +77,12 @@ public class test {
 		p1.setFImage(image1);
 		d.insertPosts(p1);
 		*/
-		
+		/*
 		Posts p2 = new Posts(d.postsIndex);
 		File image2 = new File("C:\\Users\\안준영\\Desktop\\KakaoTalk_20170713_001838256.jpg");
 		p2.setFImage(image2);		
-		d.insertPosts(p2);		
+		d.insertPosts(p2);
+		*/		
 		/*
 		Posts p3 = new Posts(d.postsIndex);
 		File image3 = new File("C:\\Users\\안준영\\Desktop\\IMG_9773.jpg");

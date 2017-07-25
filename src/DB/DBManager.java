@@ -32,10 +32,10 @@ import ProblemDomain.User;
 
 public class DBManager {
 
-	public int userIndex;
-	public int postsIndex;
-	public int recentIndex; //어플 켰을시 게시물 갯수
-	public int seeIndex; //자신이 본 인덱스
+	int userIndex;
+	int postsIndex;
+	int recentIndex; // 어플 켰을시 게시물 갯수
+	int seeIndex; // 자신이 본 인덱스
 	String MongoDB_IP = "127.0.0.1";
 	int MongoDB_PORT = 27017;
 	String DB_NAME = "db";
@@ -44,12 +44,13 @@ public class DBManager {
 	DB db = mongoClient.getDB(DB_NAME);
 	DBCollection userCollection = db.getCollection("User");
 	DBCollection postsCollection = db.getCollection("Posts");
+	DBCollection locationCollection = db.getCollection("Location");
 
 	public DBManager() {
 
 		DBCursor userCursor = userCollection.find();
 		DBCursor postsCursor = postsCollection.find();
-		
+
 		// count all users in DB
 		userIndex = (int) userCollection.count();
 
@@ -57,63 +58,68 @@ public class DBManager {
 		postsIndex = (int) postsCollection.count();
 
 		recentIndex = (int) postsCollection.count();
-		seeIndex = (int)postsCollection.count();
+		seeIndex = (int) postsCollection.count();
 	}
-	
-	public ArrayList<Posts> refreshTimeLine() throws Exception{
+
+	public int getUserIndex() {
+		return userIndex;
+	}
+
+	public int getPostsIndex() {
+		return postsIndex;
+	}
+
+	public ArrayList<Posts> refreshTimeLine() throws Exception {
 		ArrayList<Posts> P = new ArrayList<Posts>();
 		int dbIndex = (int) postsCollection.count();
-		
-		if(recentIndex < dbIndex){
-			if(dbIndex-recentIndex <= 10){
-				for(int i = 0;i<dbIndex-recentIndex;i++){
+
+		if (recentIndex < dbIndex) {
+			if (dbIndex - recentIndex <= 10) {
+				for (int i = 0; i < dbIndex - recentIndex; i++) {
 					recentIndex++;
 					Posts posts = this.getPostsByIndex(recentIndex);
-					posts.setIImage(this.getImageByIndex(recentIndex));					
+					posts.setIImage(this.getImageByIndex(recentIndex));
 					P.add(posts);
 				}
-			}
-			else{
-				for(int i =0;i<10;i++){
+			} else {
+				for (int i = 0; i < 10; i++) {
 					recentIndex++;
 					Posts posts = this.getPostsByIndex(recentIndex);
-					posts.setIImage(this.getImageByIndex(recentIndex));					
+					posts.setIImage(this.getImageByIndex(recentIndex));
 					P.add(this.getPostsByIndex(recentIndex));
 				}
 			}
 		}
-		
-		else{
+
+		else {
 			return null;
 		}
-		
+
 		return P;
 	}
-	
-	public ArrayList<Posts> getMorePosts() throws Exception{
+
+	public ArrayList<Posts> getMorePosts() throws Exception {
 		ArrayList<Posts> p = new ArrayList<Posts>();
-		
-		if(seeIndex < 10){
-			for(int i=0;i<seeIndex;i++){
+
+		if (seeIndex < 10) {
+			for (int i = 0; i < seeIndex; i++) {
+				seeIndex--;
+				Posts posts = this.getPostsByIndex(seeIndex);
+				posts.setIImage(this.getImageByIndex(seeIndex));
+				p.add(posts);
+			}
+		} else {
+			for (int i = 0; i < 10; i++) {
 				seeIndex--;
 				Posts posts = this.getPostsByIndex(seeIndex);
 				posts.setIImage(this.getImageByIndex(seeIndex));
 				p.add(posts);
 			}
 		}
-		else{
-			for(int i =0;i<10;i++){
-				seeIndex--;
-				Posts posts = this.getPostsByIndex(seeIndex);
-				posts.setIImage(this.getImageByIndex(seeIndex));
-				p.add(posts);
-			}
-		}
-		
+
 		return p;
 	}
-	
-	
+
 	public void insertUser(User user) {
 
 		BasicDBObject document = new BasicDBObject();
@@ -203,9 +209,8 @@ public class DBManager {
 
 		BasicDBObject document = new BasicDBObject();
 		document.put("index", postsIndex);
+		this.insertLocation(posts.getLocationInfo());
 		postsIndex++;
-
-		document.put("Location", posts.getLocationInfo());
 		document.put("URL", posts.getUrl());
 		document.put("Artist", posts.getArtist());
 		document.put("Song", posts.getSong());
@@ -241,7 +246,6 @@ public class DBManager {
 				e.printStackTrace();
 			}
 		}
-		
 
 		// document.put("Image", posts.getImage());
 
@@ -249,13 +253,13 @@ public class DBManager {
 		postsCollection.insert(document);
 
 	}
-	//새로받은 데이터로 게시물 업데이트
+
+	// 새로받은 데이터로 게시물 업데이트
 	public void updatePostsList(Posts posts) {
 
 		BasicDBObject updateQuery = new BasicDBObject();
 
 		updateQuery.put("index", posts.getPostsIndex());
-		updateQuery.put("Location", posts.getLocationInfo());
 		updateQuery.put("URL", posts.getUrl());
 		updateQuery.put("Artist", posts.getArtist());
 		updateQuery.put("Song", posts.getSong());
@@ -268,7 +272,7 @@ public class DBManager {
 		postsCollection.update(searchQuery, updateQuery);
 
 	}
-	
+
 	// index를 이용해 게시물 리턴
 	public Posts getPostsByIndex(int index) {
 
@@ -278,14 +282,32 @@ public class DBManager {
 		idQuery.put("index", index);
 
 		DBCursor cursorId = postsCollection.find(idQuery);
-		
-		
+
 		if (cursorId.hasNext()) {
 			DBObject check = null;
 			check = cursorId.next();
 			if (check != null) {
 				posts.setPostsIndex((Integer) check.get("index"));
-				posts.setLocationInfo((Location) check.get("Location"));
+
+				Location location = new Location();
+				BasicDBObject locQuery = new BasicDBObject();
+				locQuery.put("index", index);
+
+				DBCursor cursorLoc = locationCollection.find(locQuery);
+				if (cursorLoc.hasNext()) {
+					DBObject checkLoc = null;
+					checkLoc = cursorLoc.next();
+					if (checkLoc != null) {
+						location.setBigLocation((int)checkLoc.get("BigLocation"));
+						location.setMidLocation((int)checkLoc.get("MidLocation"));
+						location.setSmallLocation((int)checkLoc.get("SmallLocation"));
+						location.setContentID((int)checkLoc.get("ContentID"));
+						location.setContentTypeID((int)checkLoc.get("ContentTypeID"));
+						location.setTitle((String)checkLoc.get("Title"));
+						
+					}
+				}
+				posts.setLocationInfo(location);
 				posts.setUrl((String) check.get("URL"));
 				posts.setArtist((String) check.get("Artist"));
 				posts.setSong((String) check.get("Song"));
@@ -298,10 +320,8 @@ public class DBManager {
 		}
 		return null;
 	}
-	
-	
-	
-	//index를 이용해 게시물 이미지 불러오기
+
+	// index를 이용해 게시물 이미지 불러오기
 	public Image getImageByIndex(int index) throws Exception {
 
 		Posts posts = new Posts();
@@ -347,6 +367,32 @@ public class DBManager {
 		}
 
 		return null;
+	}
+
+	/*
+	 * int bigLocation; int midLocation; int smallLocation; int contentID; int
+	 * contentTypeID; String title;
+	 */
+
+	public void insertLocation(Location location) {
+
+		BasicDBObject document = new BasicDBObject();
+		document.put("index", postsIndex);
+		document.put("BigLocation", location.getBigLocation());
+		document.put("MidLocation", location.getMidLocation());
+		document.put("SmallLocation", location.getSmallLocation());
+		document.put("ContentID", location.getContentID());
+		document.put("ContentTypeID", location.getContentTypeID());
+		document.put("Title", location.getTitle());
+		// DB에 저장
+		locationCollection.insert(document);
+
+	}
+
+	public ArrayList<Posts> getPostsByLocation(Location location) {
+		ArrayList<Posts> p = new ArrayList<Posts>();
+
+		return p;
 	}
 
 }
