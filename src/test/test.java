@@ -52,21 +52,27 @@ public class test {
 			id = keyboard.next();
 
 		}
+		Posts p1 = new Posts(d.postsIndex);
+		File image1 = null;
+		p1.setFImage(image1);
+		d.insertPosts(p1);
+		
 		
 		/*
 		Posts p1 = new Posts(d.postsIndex);		
 		File image1 = new File("C:\\Users\\안준영\\Desktop\\DSC00565.jpg");
-		p1.setImage(image1);
+		p1.setFImage(image1);
 		d.insertPosts(p1);
-				
+		*/
+		
 		Posts p2 = new Posts(d.postsIndex);
 		File image2 = new File("C:\\Users\\안준영\\Desktop\\KakaoTalk_20170713_001838256.jpg");
-		p2.setImage(image2);		
+		p2.setFImage(image2);		
 		d.insertPosts(p2);		
-		
+		/*
 		Posts p3 = new Posts(d.postsIndex);
 		File image3 = new File("C:\\Users\\안준영\\Desktop\\IMG_9773.jpg");
-		p3.setImage(image3);		
+		p3.setFImage(image3);		
 		d.insertPosts(p3);
 		
 			

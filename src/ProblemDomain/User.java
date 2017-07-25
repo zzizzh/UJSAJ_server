@@ -1,7 +1,8 @@
 package ProblemDomain;
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class User {
+public class User implements Serializable{
 	
 	private int index;
 	private String id,pw;

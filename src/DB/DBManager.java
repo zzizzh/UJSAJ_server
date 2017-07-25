@@ -26,6 +26,7 @@ import com.mongodb.gridfs.GridFS;
 import com.mongodb.gridfs.GridFSDBFile;
 import com.mongodb.gridfs.GridFSInputFile;
 
+import ProblemDomain.Location;
 import ProblemDomain.Posts;
 import ProblemDomain.User;
 
@@ -33,6 +34,8 @@ public class DBManager {
 
 	public int userIndex;
 	public int postsIndex;
+	public int recentIndex; //어플 켰을시 게시물 갯수
+	public int seeIndex; //자신이 본 인덱스
 	String MongoDB_IP = "127.0.0.1";
 	int MongoDB_PORT = 27017;
 	String DB_NAME = "db";
@@ -43,30 +46,90 @@ public class DBManager {
 	DBCollection postsCollection = db.getCollection("Posts");
 
 	public DBManager() {
-	
+
 		DBCursor userCursor = userCollection.find();
 		DBCursor postsCursor = postsCollection.find();
+		
+		// count all users in DB
+		userIndex = (int) userCollection.count();
 
-		
-		userIndex = (int)userCollection.count();
-		
-		postsIndex = (int)postsCollection.count();
-		
+		// count all posts in DB
+		postsIndex = (int) postsCollection.count();
+
+		recentIndex = (int) postsCollection.count();
+		seeIndex = (int)postsCollection.count();
 	}
-
+	
+	public ArrayList<Posts> refreshTimeLine() throws Exception{
+		ArrayList<Posts> P = new ArrayList<Posts>();
+		int dbIndex = (int) postsCollection.count();
+		
+		if(recentIndex < dbIndex){
+			if(dbIndex-recentIndex <= 10){
+				for(int i = 0;i<dbIndex-recentIndex;i++){
+					recentIndex++;
+					Posts posts = this.getPostsByIndex(recentIndex);
+					posts.setIImage(this.getImageByIndex(recentIndex));					
+					P.add(posts);
+				}
+			}
+			else{
+				for(int i =0;i<10;i++){
+					recentIndex++;
+					Posts posts = this.getPostsByIndex(recentIndex);
+					posts.setIImage(this.getImageByIndex(recentIndex));					
+					P.add(this.getPostsByIndex(recentIndex));
+				}
+			}
+		}
+		
+		else{
+			return null;
+		}
+		
+		return P;
+	}
+	
+	public ArrayList<Posts> getMorePosts() throws Exception{
+		ArrayList<Posts> p = new ArrayList<Posts>();
+		
+		if(seeIndex < 10){
+			for(int i=0;i<seeIndex;i++){
+				seeIndex--;
+				Posts posts = this.getPostsByIndex(seeIndex);
+				posts.setIImage(this.getImageByIndex(seeIndex));
+				p.add(posts);
+			}
+		}
+		else{
+			for(int i =0;i<10;i++){
+				seeIndex--;
+				Posts posts = this.getPostsByIndex(seeIndex);
+				posts.setIImage(this.getImageByIndex(seeIndex));
+				p.add(posts);
+			}
+		}
+		
+		return p;
+	}
+	
+	
 	public void insertUser(User user) {
 
-		// =========== Make Data01 by BasicDBObject ===========
 		BasicDBObject document = new BasicDBObject();
+		// index 파트 만들기, 넣기
 		document.put("index", userIndex);
 		userIndex++;
-
+		// ID 파트 만들기, 넣기
 		document.put("ID", user.getId());
+		// PW 파트 만들기, 넣기
 		document.put("PW", user.getPw());
+		// LikeList 파트 만들기, 넣기
 		document.put("LikeList", user.getLikeList());
+		// MyList 파트 만들기, 넣기
 		document.put("MyList", user.getMyList());
 
-		// Insert Data01
+		// DB에 저장
 		userCollection.insert(document);
 
 	}
@@ -82,10 +145,13 @@ public class DBManager {
 		updateQuery.put("MyList", user.getMyList());
 
 		BasicDBObject searchQuery = new BasicDBObject().append("index", user.getUserIndex());
+
+		// 새로 받은 데이터로 업데이트
 		userCollection.update(searchQuery, updateQuery);
 
 	}
 
+	// 비밀번호를 이용해 id리턴받기, id중복확인, 로그인에서 필요
 	public String getPWByID(String id) {
 		String PW;
 
@@ -107,6 +173,7 @@ public class DBManager {
 		return null;
 	}
 
+	// 아이디를 이용해 유저 객체 받아오기.
 	public User getUserByID(String id) {
 
 		User user = new User();
@@ -116,7 +183,7 @@ public class DBManager {
 
 		DBCursor cursorId = userCollection.find(idQuery);
 
-		while (cursorId.hasNext()) {
+		if (cursorId.hasNext()) {
 			DBObject check = null;
 			check = cursorId.next();
 			if (check != null) {
@@ -131,7 +198,7 @@ public class DBManager {
 		return null;
 	}
 
-
+	// 게시물 쓰면 부르는 메소드
 	public void insertPosts(Posts posts) {
 
 		BasicDBObject document = new BasicDBObject();
@@ -147,31 +214,34 @@ public class DBManager {
 		document.put("Like", posts.getLike());
 		document.put("CreateTime", posts.getCreateTime());
 
-		try {
+		if (posts.getFImage() != null) {
+			try {
 
-			String newFileName = posts.getFileName();
+				String newFileName = posts.getFileName();
 
-			File imageFile = posts.getImage();
+				File imageFile = posts.getFImage();
 
-			// create a "photo" namespace
-			GridFS gfsPhoto = new GridFS(db, "Image");
+				// create a "photo" namespace
+				GridFS gfsPhoto = new GridFS(db, "Image");
 
-			// get image file from local drive
-			GridFSInputFile gfsFile = gfsPhoto.createFile(imageFile);
+				// get image file from local drive
+				GridFSInputFile gfsFile = gfsPhoto.createFile(imageFile);
 
-			// set a new filename for identify purpose
-			gfsFile.setFilename(newFileName);
+				// set a new filename for identify purpose
+				gfsFile.setFilename(newFileName);
 
-			// save the image file into mongoDB
-			gfsFile.save();
+				// save the image file into mongoDB
+				gfsFile.save();
 
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
-		} catch (MongoException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
+			} catch (UnknownHostException e) {
+				e.printStackTrace();
+			} catch (MongoException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
+		
 
 		// document.put("Image", posts.getImage());
 
@@ -179,7 +249,7 @@ public class DBManager {
 		postsCollection.insert(document);
 
 	}
-
+	//새로받은 데이터로 게시물 업데이트
 	public void updatePostsList(Posts posts) {
 
 		BasicDBObject updateQuery = new BasicDBObject();
@@ -193,13 +263,45 @@ public class DBManager {
 		updateQuery.put("PostsID", posts.getPostsID());
 		updateQuery.put("Like", posts.getLike());
 		updateQuery.put("CreateTime", posts.getCreateTime());
-		updateQuery.put("Image", posts.getImage());
 
 		BasicDBObject searchQuery = new BasicDBObject().append("index", posts.getPostsIndex());
 		postsCollection.update(searchQuery, updateQuery);
 
 	}
+	
+	// index를 이용해 게시물 리턴
+	public Posts getPostsByIndex(int index) {
 
+		Posts posts = new Posts();
+
+		BasicDBObject idQuery = new BasicDBObject();
+		idQuery.put("index", index);
+
+		DBCursor cursorId = postsCollection.find(idQuery);
+		
+		
+		if (cursorId.hasNext()) {
+			DBObject check = null;
+			check = cursorId.next();
+			if (check != null) {
+				posts.setPostsIndex((Integer) check.get("index"));
+				posts.setLocationInfo((Location) check.get("Location"));
+				posts.setUrl((String) check.get("URL"));
+				posts.setArtist((String) check.get("Artist"));
+				posts.setSong((String) check.get("Song"));
+				posts.setComment((String) check.get("Comment"));
+				posts.setPostsID((int) check.get("PostsID"));
+				posts.setLike((int) check.get("Like"));
+				posts.setCreateTime((long) check.get("CreateTime"));
+				return posts;
+			}
+		}
+		return null;
+	}
+	
+	
+	
+	//index를 이용해 게시물 이미지 불러오기
 	public Image getImageByIndex(int index) throws Exception {
 
 		Posts posts = new Posts();
@@ -215,32 +317,31 @@ public class DBManager {
 			DBObject check = null;
 			check = cursorId.next();
 			if (check != null) {
-				
-				try(ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
-					
+
+				try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+
 					GridFSDBFile imageForOutput = gfsPhoto.findOne(Integer.toString(index));
 					imageForOutput.writeTo(outputStream);
-					
-					
+
 					BufferedImage bimage;
 					Image newImage;
-					
-					 ImageInputStream iis = ImageIO.createImageInputStream(new ByteArrayInputStream(outputStream.toByteArray()));
-			         Iterator<ImageReader> iter=ImageIO.getImageReaders(iis);
-			         if (iter.hasNext()) {
-			             ImageReader reader = (ImageReader)iter.next();
-			             reader.setInput(iis);
-			         }
-			         bimage = ImageIO.read(new ByteArrayInputStream(outputStream.toByteArray()));
-			         
-			         newImage = (Image)bimage;
-			         
-			         return newImage;
-					
-				  } catch(IOException e) {
-				    throw new Exception("Cannot retrieve content of gridFsFile [" + index + "]", e);
-				  }		
-				
+
+					ImageInputStream iis = ImageIO
+							.createImageInputStream(new ByteArrayInputStream(outputStream.toByteArray()));
+					Iterator<ImageReader> iter = ImageIO.getImageReaders(iis);
+					if (iter.hasNext()) {
+						ImageReader reader = (ImageReader) iter.next();
+						reader.setInput(iis);
+					}
+					bimage = ImageIO.read(new ByteArrayInputStream(outputStream.toByteArray()));
+
+					newImage = (Image) bimage;
+
+					return newImage;
+
+				} catch (IOException e) {
+					throw new Exception("Cannot retrieve content of gridFsFile [" + index + "]", e);
+				}
 
 			}
 		}

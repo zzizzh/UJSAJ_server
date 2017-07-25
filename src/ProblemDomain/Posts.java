@@ -2,8 +2,9 @@ package ProblemDomain;
 
 import java.awt.Image;
 import java.io.File;
+import java.io.Serializable;
 
-public class Posts {
+public class Posts implements Serializable{
 
 	int index;
 	Location locationInfo;
@@ -16,7 +17,8 @@ public class Posts {
 	int like;
 	
 	long createTime;
-	File image;
+	File Fimage;
+	Image Iimage;
 	
 	public Posts(){
 		this.index = 0;
@@ -27,7 +29,8 @@ public class Posts {
 		this.postsID = 0;
 		this.like = 0;
 		this.createTime = 0;
-		this.image = null;
+		this.Fimage = null;
+		this.Iimage = null;
 	}
 	
 	public Posts(int index){
@@ -39,11 +42,15 @@ public class Posts {
 		this.postsID = 0;
 		this.like = 0;
 		this.createTime = 0;
-		this.image = null;
+		this.Fimage = null;
+		this.Iimage = null;
 	}
 	
 	public int getPostsIndex(){
 		return index;
+	}
+	public void setPostsIndex(int index){
+		this.index = index;
 	}
 	public Location getLocationInfo() {
 		return locationInfo;
@@ -97,11 +104,17 @@ public class Posts {
 	public String getFileName(){
 		return Integer.toString(index);
 	}	
-	public File getImage(){
-		return image;
+	public File getFImage(){
+		return Fimage;
 	}
-	public void setImage(File image){
-		this.image = image;
+	public void setFImage(File image){
+		this.Fimage = image;
+	}
+	public Image getIImage(){
+		return Iimage;
+	}
+	public void setIImage(Image image){
+		this.Iimage = image;
 	}
 	
 }

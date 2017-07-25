@@ -1,8 +1,9 @@
 package ProblemDomain;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Location {
+public class Location implements Serializable{
 	ArrayList<Integer> catList;
 	int contentID;
 	int contentTypeID;
