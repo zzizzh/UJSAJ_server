@@ -43,25 +43,15 @@ public class DBManager {
 	DBCollection postsCollection = db.getCollection("Posts");
 
 	public DBManager() {
-		int userIndex = 0;
-		int postsIndex = 0;
-
+	
 		DBCursor userCursor = userCollection.find();
 		DBCursor postsCursor = postsCollection.find();
 
-		while (userCursor.hasNext()) {
-			userCursor.next();
-			userIndex++;
-		}
-
-		while (postsCursor.hasNext()) {
-			postsCursor.next();
-			postsIndex++;
-		}
-
-		this.userIndex = userIndex;
-		this.postsIndex = postsIndex;
-
+		
+		userIndex = (int)userCollection.count();
+		
+		postsIndex = (int)postsCollection.count();
+		
 	}
 
 	public void insertUser(User user) {
@@ -141,15 +131,6 @@ public class DBManager {
 		return null;
 	}
 
-	/*
-	 * int postsIndex; Location locationInfo; String url; String artist; String
-	 * song; String comment;
-	 * 
-	 * int postsID; int like;
-	 * 
-	 * long createTime; Image image;
-	 * 
-	 */
 
 	public void insertPosts(Posts posts) {
 

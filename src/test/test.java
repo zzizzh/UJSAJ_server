@@ -1,5 +1,4 @@
 package test;
-
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
@@ -54,7 +53,7 @@ public class test {
 
 		}
 		
-
+		/*
 		Posts p1 = new Posts(d.postsIndex);		
 		File image1 = new File("C:\\Users\\안준영\\Desktop\\DSC00565.jpg");
 		p1.setImage(image1);
@@ -70,23 +69,12 @@ public class test {
 		p3.setImage(image3);		
 		d.insertPosts(p3);
 		
-		byte[] chunk = d.getImageByIndex(1);
+			
+		Image image = d.getImageByIndex(0);
+		BufferedImage bimage = (BufferedImage) image;
+        ImageIO.write(bimage, "jpg", new File("C:\\Users\\안준영\\Desktop\\디비에서불러오기.jpg"));
+	*/
 		
-		BufferedImage bimage;
-		Image newImage;
-		
-		 ImageInputStream iis = ImageIO.createImageInputStream(new ByteArrayInputStream(chunk));
-         Iterator<ImageReader> iter=ImageIO.getImageReaders(iis);
-         if (iter.hasNext()) {
-             ImageReader reader = (ImageReader)iter.next();
-             reader.setInput(iis);
-         }
-         bimage = ImageIO.read( new ByteArrayInputStream(chunk));
-         
-         newImage = (Image)bimage;
-         
-         ImageIO.write(bimage, "jpg", new File("C:\\Users\\안준영\\Desktop\\디비에서불러오기.jpg"));
-
 	}
 
 }
