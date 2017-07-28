@@ -23,6 +23,7 @@ public class Posts {
 	
 	long createTime;
 	Image image;
+	
 	public Location getLocationInfo() {
 		return locationInfo;
 	}
