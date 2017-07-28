@@ -1,19 +1,15 @@
 package PhysicalArchitecture;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.OutputStream;
-import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.StringTokenizer;
 
 import DB.DBManager;
+import ProblemDomain.Posts;
 
 public class Server extends Thread// ＆서버오픈클래스
 {
@@ -21,7 +17,6 @@ public class Server extends Thread// ＆서버오픈클래스
 	private int port;
 	private int clientNumber;
 	private static ArrayList<EchoThread> clientList;
-	private DBManager dbManager;
 	
 	public Server(int port) {
 		clientList = new ArrayList<EchoThread>();
@@ -35,16 +30,9 @@ public class Server extends Thread// ＆서버오픈클래스
 			System.out.println("접속을 기다립니다.");
 
 			while (true) {
-
-				Socket sock = server.accept(); // 접속 대기
-
-				EchoThread echothread = new EchoThread(sock, clientNumber++); // 클라이언트
-																				// 접속
-																				// 시
-																				// 실행되며
-				// echoThread 생성
-				echothread.start(); // run()메소드 실행
-
+				Socket sock = server.accept(); 
+				EchoThread echothread = new EchoThread(sock, clientNumber++); 
+				echothread.start(); 
 				System.out.println("ActiveCount : " + EchoThread.activeCount);
 				clientList.add(echothread);
 			}
@@ -56,9 +44,10 @@ public class Server extends Thread// ＆서버오픈클래스
 	public static ArrayList<EchoThread> getEchoThreadList() {
 		return clientList;
 	}
+
 }
 
-class EchoThread extends Thread { // ＆클라이언트간 멀티쓰레드 구현
+class EchoThread extends Thread { 
 	private ArrayList<EchoThread> clientList;
 	static int activeCount = 0;
 
@@ -66,17 +55,16 @@ class EchoThread extends Thread { // ＆클라이언트간 멀티쓰레드 구현
 	private int clientNumber;
 
 	ObjectOutputStream serverOutputStream;
-	OutputStream out;
-	InputStream in;
-	PrintWriter pw;
-	BufferedReader br;
+	ObjectInputStream in;
+
+	private ServerConsole serverConsole; 
 
 	public EchoThread(Socket sock, int clientNumber) {
 		this.sock = sock;
-		activeCount++; // 해당 클레스 생성 시 값 증가
+		activeCount++; 
 		this.clientNumber = clientNumber;
 		Server.getEchoThreadList();
-	} // 생성자
+	} 
 
 	public int getClientNumber() {
 		return clientNumber;
@@ -86,30 +74,39 @@ class EchoThread extends Thread { // ＆클라이언트간 멀티쓰레드 구현
 		return serverOutputStream;
 	}
 
-	public void run() { // start() 실행 시 호출
-		try { // I/O 등 기능 구현
+	public void run() { 
+		try { 
 			InetAddress inetaddr = sock.getInetAddress();
 			System.out.println(inetaddr.getHostAddress() + " 로부터 접속하였습니다.");
-			serverOutputStream = new ObjectOutputStream(sock.getOutputStream());// ＆클라이언트로	보내는   object스트림
-			in = sock.getInputStream();// ＆클라이언트로부터 받는 strign스트림
-			br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
+			serverOutputStream = new ObjectOutputStream(sock.getOutputStream());
+			in = new ObjectInputStream(sock.getInputStream());
+			serverConsole = new ServerConsole(serverOutputStream);
 
+			Object temp;
 			String line = null;
 
-			while ((line = br.readLine()) != null) {
-				// 어느 클라이언트가 보냈는지 확인 할 수 있나?
-				System.out.println("클라이언트로 부터 전송받은 문자열 : " + line);
-				handleMeg(line);
-			}
-
-			br.close();
-			sock.close();
-			activeCount--;
-			clientList = Server.getEchoThreadList();
-			for (int i = 0; i < clientList.size(); i++)// ＆클라이언트가 탈락시 해당 클라이언트찾아서 삭제
+			while(true)
 			{
-				if (clientNumber == clientList.get(i).getClientNumber())
-					clientList.remove(i);
+				try {
+					Thread.sleep(10);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				temp = in.readObject();
+				
+				if(temp instanceof String)
+				{
+					line = (String) temp;
+					System.out.println("-----클라이언트로 부터 전송받은 문자열 : " + line);
+					serverConsole.handleMeg(line);
+				}
+				else if(temp instanceof Posts)
+				{
+					System.out.println("-----클라이언트로 부터 전송받은 데이터 : " + temp.toString());
+					serverConsole.post((Posts)temp);
+				}
+				
 			}
 
 		} catch (Exception ex) {
@@ -124,48 +121,7 @@ class EchoThread extends Thread { // ＆클라이언트간 멀티쓰레드 구현
 		}
 	}
 
-	public void handleMeg(String msg)// ＆ 클라이언트로 부터 입력받을 명령어를 서버에서 처리하는 메소드
-	// 토커나이즈로 끊어서 구현할 것 . ex #book"회의실30"대구북구"노혜성"01049497193
-	{
-		StringTokenizer token = new StringTokenizer(msg, "#");
-		
-		if (msg.startsWith("login")) {
-			String pw = dbManager.getPWbyID(token.nextToken());
-			if (pw.equals(token.nextToken()))
-				sendToClientString("success");
-			else
-				sendToClientString("false");
-		}
-		else if (msg.startsWith("regist")) {
-			if (dbManager.getPWbyID(token.nextToken()) != null)
-				sendToClientString("success");
-			else 
-				sendToClientString("false");
-			
-		}
-		/*} else if (msg.startsWith("#login")) {
-			Login(msg);
-		} else if (msg.startsWith("#joinC"))
-		{
-			JoinC(msg);
-		} else if (msg.startsWith("#joinB"))
-		{
-			JoinB(msg);
-		} else if (msg.startsWith("#search")) {
-			Search(msg,roomlist);			
-		}*/
-		
-	}
 
-	//@@현재 클라이언트에게 String을 넘겨주는 함수
-	private void sendToClientString(String line) {
-		ObjectOutputStream temp = this.getOutput();
-		try {
-
-			temp.writeObject(line);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
 }
+
+

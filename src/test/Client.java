@@ -5,9 +5,15 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
+import Foundation.PostsList;
 import ProblemDomain.Posts;
+import ProblemDomain.User;
 
-
+/*
+ * client 클래스안에 
+ * read와 write하는 class를 갖고있음.
+ * 
+ */
 public class Client
 {
 	Socket sock;
@@ -68,11 +74,16 @@ class clientRead extends Thread//서버로 부터 메세지 받기.
 					e.printStackTrace();
 				}
 				temp = clientInputStream.readObject();
-				if(temp instanceof Posts)
+				
+				if(temp instanceof PostsList)
 				{					
 						
 				}
-			
+				else if(temp instanceof User)
+				{
+					
+				}
+				
 				else
 				{
 					String line = (String) temp;
@@ -109,23 +120,19 @@ class clientWrite extends Thread//서버로 메세지 보내기
 {
 	private Socket socket;
 	private String console;
-	private roomList console1;
-	private conferenceRoom console2;
-	private CbookList console3;
-	private bookedRoom console4;
+	private Posts postsConsole;
+	private User userConsole;
+	
 	private boolean sendToReadyString;
-	private boolean sendToReadyList;
-	private boolean sendToReadyRoom;
-	private boolean sendToReadyBook;
-	private boolean sendToReadybookedRoom;
+	private boolean sendToReadyPosts;
+	private boolean sendToReadyUser;
+	
 	public clientWrite(Socket socket)
 	{
 		this.socket=socket;
 		sendToReadyString=false;
-		sendToReadyList=false;
-		sendToReadyRoom=false;
-		sendToReadyBook=false;
-		sendToReadybookedRoom=false;
+		sendToReadyPosts=false;
+		sendToReadyUser=false;
 	}
 	public void run()
 	{
@@ -148,33 +155,20 @@ class clientWrite extends Thread//서버로 메세지 보내기
 					sendToReadyString=false;
 					System.out.println("-----server로 -메세지-전송");					
 				}
-				while(sendToReadyList==true)//& 보낼준비가 될때만 실행도록 하는 반복문
+				while(sendToReadyPosts==true)//& 보낼준비가 될때만 실행도록 하는 반복문
 				{
-					out.writeObject(console1);
-					sendToReadyList=false;
+					out.writeObject(postsConsole);
+					sendToReadyPosts=false;
 					System.out.println("-----server로 -list-전송");					
 				}
-				while(sendToReadyRoom==true)//& 보낼준비가 될때만 실행도록 하는 반복문
+				while(sendToReadyUser==true)//& 보낼준비가 될때만 실행도록 하는 반복문
 				{
-					out.writeObject(console2);
-					sendToReadyRoom=false;
+					out.writeObject(userConsole);
+					sendToReadyUser=false;
 					System.out.println("-----server로 -room-전송");					
 				}
-				while(sendToReadyBook==true)//& 보낼준비가 될때만 실행도록 하는 반복문
-				{
-					out.writeObject(console3);
-					sendToReadyBook=false;
-					System.out.println("-----server로 -book-전송");					
-				}
-				while(sendToReadybookedRoom==true)//& 보낼준비가 될때만 실행도록 하는 반복문
-				{
-					out.writeObject(console4);
-					sendToReadybookedRoom=false;
-					System.out.println("-----server로 -bookedRoom-전송");               
-				}
+				
 			}		
-
-
 		} 
 		catch (IOException e) 
 		{
@@ -196,24 +190,15 @@ class clientWrite extends Thread//서버로 메세지 보내기
 		console=msg;
 		sendToReadyString=true;
 	}
-	public void sendToServerRoomList(roomList list)
+	public void sendToServerPosts(Posts posts)
 	{
-		console1=list;
-		sendToReadyList=true;
+		postsConsole=posts;
+		sendToReadyPosts=true;
 	}
-	public void sendToServerRoom(conferenceRoom room)
+	public void sendToServerRoom(User user)
 	{
-		console2=room;
-		sendToReadyRoom=true;
+		userConsole=user;
+		sendToReadyUser=true;
 	}
-	public void sendToServerBookList(CbookList list)
-	{
-		console3=list;
-		sendToReadyBook=true;
-	}
-	public void sendToServerbookedRoom(bookedRoom book)
-	{
-		console4=book;
-		sendToReadybookedRoom=true;
-	}
+
 }

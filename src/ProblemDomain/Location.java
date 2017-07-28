@@ -2,6 +2,16 @@ package ProblemDomain;
 
 import java.util.ArrayList;
 
+
+/**
+ * @author jm
+ * 
+ * tour information that get from TourAPI
+ * catList(index) 	: Big(0), middle(1), small(2) category
+ * contentID 		: tour information id
+ * contentTypeID 	: tour information type id 
+ * title			: tour information title 
+ */
 public class Location {
 	ArrayList<Integer> catList;
 	int contentID;
