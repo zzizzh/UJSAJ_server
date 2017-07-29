@@ -280,7 +280,6 @@ public class DBManager {
 		document.put("index", index);
 		postsCollection.remove(document);
 	}
-<<<<<<< HEAD
 	
 	// index를 이용해 게시물 리턴
 	public Posts getPostsByIndex(int index) {
@@ -404,6 +403,4 @@ public class DBManager {
 		return p;
 	}
 
-=======
->>>>>>> 3840e6fae761c98a469aa8bf144fa980f91ce862
 }
