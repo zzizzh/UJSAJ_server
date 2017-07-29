@@ -25,6 +25,9 @@ public class test {
 		Posts p = new Posts();
 		Location l = new Location();
 		
+		d.deletePosts(1);
+		
+		/*
 		l.setBigLocation(1);
 		l.setMidLocation(1);
 		l.setSmallLocation(1);
@@ -32,7 +35,7 @@ public class test {
 		p.setLocationInfo(l);
 		
 		d.insertPosts(p);
-		
+		*/
 		
 /*
 		String string = keyboard.next();

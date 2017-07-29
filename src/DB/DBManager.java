@@ -156,6 +156,7 @@ public class DBManager {
 		userCollection.update(searchQuery, updateQuery);
 
 	}
+	
 
 	// 비밀번호를 이용해 id리턴받기, id중복확인, 로그인에서 필요
 	public String getPWByID(String id) {
@@ -273,6 +274,12 @@ public class DBManager {
 
 	}
 
+	public void deletePosts(int index){
+		DBObject document = new BasicDBObject();
+		document.put("index", index);
+		postsCollection.remove(document);
+	}
+	
 	// index를 이용해 게시물 리턴
 	public Posts getPostsByIndex(int index) {
 
