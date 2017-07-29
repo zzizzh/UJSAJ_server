@@ -1,22 +1,27 @@
 package PhysicalArchitecture;
 
+<<<<<<< HEAD
 import java.io.BufferedReader;
 
+=======
+>>>>>>> 3840e6fae761c98a469aa8bf144fa980f91ce862
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.OutputStream;
-import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.StringTokenizer;
 
 import DB.DBManager;
+<<<<<<< HEAD
 import DB.*;
 public class Server extends Thread// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Å¬ï¿½ï¿½ï¿½ï¿½
+=======
+import ProblemDomain.Posts;
+
+public class Server extends Thread// £¦¼­¹ö¿ÀÇÂÅ¬·¡½º
+>>>>>>> 3840e6fae761c98a469aa8bf144fa980f91ce862
 {
 	private ServerSocket server;
 	private int port;
@@ -35,6 +40,7 @@ public class Server extends Thread// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Å¬ï¿½ï¿½ï¿½ï¿
 			System.out.println("ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ù¸ï¿½ï¿½Ï´ï¿½.");
 
 			while (true) {
+<<<<<<< HEAD
 
 				Socket sock = server.accept(); // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
 
@@ -45,6 +51,11 @@ public class Server extends Thread// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Å¬ï¿½ï¿½ï¿½ï¿
 				// echoThread ï¿½ï¿½ï¿½ï¿½
 				echothread.start(); // run()ï¿½Þ¼Òµï¿½ ï¿½ï¿½ï¿½ï¿½
 
+=======
+				Socket sock = server.accept(); 
+				EchoThread echothread = new EchoThread(sock, clientNumber++); 
+				echothread.start(); 
+>>>>>>> 3840e6fae761c98a469aa8bf144fa980f91ce862
 				System.out.println("ActiveCount : " + EchoThread.activeCount);
 				clientList.add(echothread);
 			}
@@ -56,9 +67,14 @@ public class Server extends Thread// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Å¬ï¿½ï¿½ï¿½ï¿
 	public static ArrayList<EchoThread> getEchoThreadList() {
 		return clientList;
 	}
+
 }
 
+<<<<<<< HEAD
 class EchoThread extends Thread { // ï¿½ï¿½Å¬ï¿½ï¿½ï¿½Ì¾ï¿½Æ®ï¿½ï¿½ ï¿½ï¿½Æ¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+=======
+class EchoThread extends Thread { 
+>>>>>>> 3840e6fae761c98a469aa8bf144fa980f91ce862
 	private ArrayList<EchoThread> clientList;
 	static int activeCount = 0;
 
@@ -66,6 +82,7 @@ class EchoThread extends Thread { // ï¿½ï¿½Å¬ï¿½ï¿½ï¿½Ì¾ï¿½Æ®ï¿½ï¿½ ï¿½ï¿½Æ¼ï¿½ï
 	private int clientNumber;
 
 	ObjectOutputStream serverOutputStream;
+<<<<<<< HEAD
 	OutputStream out;
 	InputStream in;
 	PrintWriter pw;
@@ -78,6 +95,18 @@ class EchoThread extends Thread { // ï¿½ï¿½Å¬ï¿½ï¿½ï¿½Ì¾ï¿½Æ®ï¿½ï¿½ ï¿½ï¿½Æ¼ï¿½ï
 		this.clientNumber = clientNumber;
 		Server.getEchoThreadList();
 	} // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+=======
+	ObjectInputStream in;
+
+	private ServerConsole serverConsole; 
+
+	public EchoThread(Socket sock, int clientNumber) {
+		this.sock = sock;
+		activeCount++; 
+		this.clientNumber = clientNumber;
+		Server.getEchoThreadList();
+	} 
+>>>>>>> 3840e6fae761c98a469aa8bf144fa980f91ce862
 
 	public int getClientNumber() {
 		return clientNumber;
@@ -87,6 +116,7 @@ class EchoThread extends Thread { // ï¿½ï¿½Å¬ï¿½ï¿½ï¿½Ì¾ï¿½Æ®ï¿½ï¿½ ï¿½ï¿½Æ¼ï¿½ï
 		return serverOutputStream;
 	}
 
+<<<<<<< HEAD
 	public void run() { // start() ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ È£ï¿½ï¿½
 		try { // I/O ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 			InetAddress inetaddr = sock.getInetAddress();
@@ -94,9 +124,20 @@ class EchoThread extends Thread { // ï¿½ï¿½Å¬ï¿½ï¿½ï¿½Ì¾ï¿½Æ®ï¿½ï¿½ ï¿½ï¿½Æ¼ï¿½ï
 			serverOutputStream = new ObjectOutputStream(sock.getOutputStream());// ï¿½ï¿½Å¬ï¿½ï¿½ï¿½Ì¾ï¿½Æ®ï¿½ï¿½	ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½   objectï¿½ï¿½Æ®ï¿½ï¿½
 			in = sock.getInputStream();// ï¿½ï¿½Å¬ï¿½ï¿½ï¿½Ì¾ï¿½Æ®ï¿½Îºï¿½ï¿½ï¿½ ï¿½Þ´ï¿½ strignï¿½ï¿½Æ®ï¿½ï¿½
 			br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
+=======
+	public void run() { 
+		try { 
+			InetAddress inetaddr = sock.getInetAddress();
+			System.out.println(inetaddr.getHostAddress() + " ·ÎºÎÅÍ Á¢¼ÓÇÏ¿´½À´Ï´Ù.");
+			serverOutputStream = new ObjectOutputStream(sock.getOutputStream());
+			in = new ObjectInputStream(sock.getInputStream());
+			serverConsole = new ServerConsole(serverOutputStream);
+>>>>>>> 3840e6fae761c98a469aa8bf144fa980f91ce862
 
+			Object temp;
 			String line = null;
 
+<<<<<<< HEAD
 			while ((line = br.readLine()) != null) {
 				// ï¿½ï¿½ï¿½ Å¬ï¿½ï¿½ï¿½Ì¾ï¿½Æ®ï¿½ï¿½ ï¿½ï¿½ï¿½Â´ï¿½ï¿½ï¿½ È®ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ ï¿½Ö³ï¿½?
 				System.out.println("Å¬ï¿½ï¿½ï¿½Ì¾ï¿½Æ®ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Û¹ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ú¿ï¿½ : " + line);
@@ -108,9 +149,30 @@ class EchoThread extends Thread { // ï¿½ï¿½Å¬ï¿½ï¿½ï¿½Ì¾ï¿½Æ®ï¿½ï¿½ ï¿½ï¿½Æ¼ï¿½ï
 			activeCount--;
 			clientList = Server.getEchoThreadList();
 			for (int i = 0; i < clientList.size(); i++)// ï¿½ï¿½Å¬ï¿½ï¿½ï¿½Ì¾ï¿½Æ®ï¿½ï¿½ Å»ï¿½ï¿½ï¿½ï¿½ ï¿½Ø´ï¿½ Å¬ï¿½ï¿½ï¿½Ì¾ï¿½Æ®Ã£ï¿½Æ¼ï¿½ ï¿½ï¿½ï¿½ï¿½
+=======
+			while(true)
+>>>>>>> 3840e6fae761c98a469aa8bf144fa980f91ce862
 			{
-				if (clientNumber == clientList.get(i).getClientNumber())
-					clientList.remove(i);
+				try {
+					Thread.sleep(10);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				temp = in.readObject();
+				
+				if(temp instanceof String)
+				{
+					line = (String) temp;
+					System.out.println("-----Å¬¶óÀÌ¾ðÆ®·Î ºÎÅÍ Àü¼Û¹ÞÀº ¹®ÀÚ¿­ : " + line);
+					serverConsole.handleMeg(line);
+				}
+				else if(temp instanceof Posts)
+				{
+					System.out.println("-----Å¬¶óÀÌ¾ðÆ®·Î ºÎÅÍ Àü¼Û¹ÞÀº µ¥ÀÌÅÍ : " + temp.toString());
+					serverConsole.post((Posts)temp);
+				}
+				
 			}
 
 		} catch (Exception ex) {
@@ -125,6 +187,7 @@ class EchoThread extends Thread { // ï¿½ï¿½Å¬ï¿½ï¿½ï¿½Ì¾ï¿½Æ®ï¿½ï¿½ ï¿½ï¿½Æ¼ï¿½ï
 		}
 	}
 
+<<<<<<< HEAD
 	public void handleMeg(String msg)// ï¿½ï¿½ Å¬ï¿½ï¿½ï¿½Ì¾ï¿½Æ®ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ô·Â¹ï¿½ï¿½ï¿½ ï¿½ï¿½É¾î¸¦ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Ã³ï¿½ï¿½ï¿½Ï´ï¿½ ï¿½Þ¼Òµï¿½
 	// ï¿½ï¿½Ä¿ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½î¼­ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ . ex #book"È¸ï¿½Ç½ï¿½30"ï¿½ë±¸ï¿½Ï±ï¿½"ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½"01049497193
 	{
@@ -162,11 +225,9 @@ class EchoThread extends Thread { // ï¿½ï¿½Å¬ï¿½ï¿½ï¿½Ì¾ï¿½Æ®ï¿½ï¿½ ï¿½ï¿½Æ¼ï¿½ï
 	private void sendToClientString(String line) {
 		ObjectOutputStream temp = this.getOutput();
 		try {
+=======
+>>>>>>> 3840e6fae761c98a469aa8bf144fa980f91ce862
 
-			temp.writeObject(line);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
 }
+
+

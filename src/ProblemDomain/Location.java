@@ -3,10 +3,25 @@ package ProblemDomain;
 import java.io.Serializable;
 import java.util.ArrayList;
 
+<<<<<<< HEAD
 public class Location implements Serializable{
 	int bigLocation;
 	int midLocation;
 	int smallLocation;
+=======
+
+/**
+ * @author jm
+ * 
+ * tour information that get from TourAPI
+ * catList(index) 	: Big(0), middle(1), small(2) category
+ * contentID 		: tour information id
+ * contentTypeID 	: tour information type id 
+ * title			: tour information title 
+ */
+public class Location {
+	ArrayList<Integer> catList;
+>>>>>>> 3840e6fae761c98a469aa8bf144fa980f91ce862
 	int contentID;
 	int contentTypeID;
 	String title;

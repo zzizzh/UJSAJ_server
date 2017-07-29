@@ -37,6 +37,7 @@ public class DBManager {
 	int recentIndex; // 어플 켰을시 게시물 갯수
 	int seeIndex; // 자신이 본 인덱스
 	String MongoDB_IP = "127.0.0.1";
+	String MongoDB_IP = "222.104.203.106";
 	int MongoDB_PORT = 27017;
 	String DB_NAME = "db";
 
@@ -279,6 +280,7 @@ public class DBManager {
 		document.put("index", index);
 		postsCollection.remove(document);
 	}
+<<<<<<< HEAD
 	
 	// index를 이용해 게시물 리턴
 	public Posts getPostsByIndex(int index) {
@@ -402,4 +404,6 @@ public class DBManager {
 		return p;
 	}
 
+=======
+>>>>>>> 3840e6fae761c98a469aa8bf144fa980f91ce862
 }

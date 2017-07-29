@@ -4,7 +4,19 @@ import java.awt.Image;
 import java.io.File;
 import java.io.Serializable;
 
+<<<<<<< HEAD
 public class Posts implements Serializable{
+=======
+/**
+ * @author jm
+ * 
+ * Posts data writed by User
+ * Location 	: tour information
+ * url 			: youtube movie url
+ * artist		: 
+ */
+public class Posts {
+>>>>>>> 3840e6fae761c98a469aa8bf144fa980f91ce862
 
 	int index;
 	Location locationInfo;
@@ -17,6 +29,7 @@ public class Posts implements Serializable{
 	int like;
 	
 	long createTime;
+<<<<<<< HEAD
 	File Fimage;
 	Image Iimage;
 	
@@ -52,6 +65,10 @@ public class Posts implements Serializable{
 	public void setPostsIndex(int index){
 		this.index = index;
 	}
+=======
+	Image image;
+	
+>>>>>>> 3840e6fae761c98a469aa8bf144fa980f91ce862
 	public Location getLocationInfo() {
 		return locationInfo;
 	}
