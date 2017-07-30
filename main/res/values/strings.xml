@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">이거나 들어</string>
+    <string name="action_settings">설정</string>
+    <string name="section_format">화면 %1$d</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+</resources>
