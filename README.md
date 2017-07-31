@@ -1,7 +1,5 @@
-# UJSAJ_server
 
-
-< 프로젝트 주요 과제 ? 서버/DB>
+< 프로젝트 주요 과제 – 서버/DB>
 
 ■ DB에서는 최근 시간, 위치, 카테고리, 콘텐츠 타입에 해당하는 Posts를 return 할 수 있어야 한다. 
 
@@ -9,7 +7,7 @@
 
 ■ 서버에서 클라이언트의 명령은 #과 $로 구분한다. #은 명령어의 시작, $은 명령어의 토큰 구분자이다.
 
-■ 클라이언트 ? 서버 연결은 일대다 통신으로 쓰레드를 사용해서 여러 클라이언트에서 들어온 요청을 하나의 서버에서 모두 처리해 주어야 한다.
+■ 클라이언트 – 서버 연결은 일대다 통신으로 쓰레드를 사용해서 여러 클라이언트에서 들어온 요청을 하나의 서버에서 모두 처리해 주어야 한다.
 
 
 < 그 외 세부 사항>
@@ -27,44 +25,44 @@
 
 < 서버-클라이언트 간 명령 명세 >
 ■ 로그인
-● 클라이언트->서버 : (string) #login$id$password
-● 서버<-클라이언트 : User
+● 클라이언트->서버 : (string) #login$id$pass / 
+● 서버->클라이언트 : (string) #err or User
 
 ■ 회원가입
 ● 클라이언트->서버 : (string) #register$id$password
-● 서버<-클라이언트 : #fin
+● 서버->클라이언트 : #fin or #err
 
 ■ 타임라인 포스트 요청(시간, 위치)
-● 클라이언트->서버 : (string) #moreposts
-● 서버<-클라이언트 : ArrayList<Posts>
+● 클라이언트->서버 : (string) #morePosts
+● 서버->클라이언트 : ArrayList<Posts>
 
 ■ 타임라인 포스트 새로고침(시간, 위치)
 ● 클라이언트->서버 : (string) #refresh
-● 서버<-클라이언트 : ArrayList<Posts>
+● 서버->클라이언트 : ArrayList<Posts>
 
 ■ 내가 좋아요 한 포스트 요청(처음)
-● 클라이언트->서버 : (string) #mylike
-● 서버<-클라이언트 : ArrayList<Posts>
+● 클라이언트->서버 : (string) #myLike
+● 서버->클라이언트 : ArrayList<Posts>
 
 ■ 내가 좋아요 한 포스트 요청(추가)
-● 클라이언트->서버 : (string) #morelike
-● 서버<-클라이언트 : ArrayList<Posts>
+● 클라이언트->서버 : (string) #moreLike
+● 서버->클라이언트 : ArrayList<Posts>
 
 ■ 포스트 쓰기(포스트 저장)
-● 클라이언트->서버 : (string) #post	/ 서버<-클라이언트 : #ready
-● 클라이언트->서버 : Posts		/ 서버<-클라이언트 : #fin
+● 클라이언트->서버 : (string) #post / 서버->클라이언트 : #ready
+● 클라이언트->서버 : Posts
 
 ■ 내가 쓴 포스트 삭제
 ● 클라이언트->서버 : (string) #delete$(int)index
-● 서버<-클라이언트 : #fin
+● 서버->클라이언트 : #fin
 
 ■ 포스트 좋아요
 ● 클라이언트->서버 : (string) #like$(int)index
-● 서버<-클라이언트 : #fin
+● 서버->클라이언트 : #fin
 
 ■ 포스트 좋아요 취소
 ● 클라이언트->서버 : (string) #unlike$(int)index
-■ 서버<-클라이언트 : #fin
+■ 서버->클라이언트 : #fin
 < 데이터 클래스 >
 < 서버/DB 함수 >
 < 안드로이드 함수 >
