@@ -13,7 +13,7 @@ public class ServerConsole {
 	private DBManager dbManager;
 
 	public ServerConsole(ObjectOutputStream objout) {
-		dbManager = new DBManager();
+	//	dbManager = new DBManager();
 		objOutput = objout;
 	}
 
@@ -21,19 +21,23 @@ public class ServerConsole {
 	 * 클라이언트에서 받은 명령어를 처리하는 함수 명령어는 #으로 시작하고 $로 토큰을 구분한다.
 	 */
 	public void handleMeg(String msg) {
+		System.out.println("클라이언트로부터 받은 문자열 : " + msg);
+		
 		if (msg.startsWith("#register")) {
+			System.out.println("등록");
 			msg = msg.substring(9);
 			
 			register(msg);
-			
 		}
 
 		else if (msg.startsWith("#login")) {
-		
-			msg = msg.substring(6);
+			System.out.println("로그안");
+			
+			msg = msg.substring(7);
 			login(msg);
 			
 		} else if (msg.startsWith("#morePosts")) {
+			
 			morePosts();
 		} else if (msg.startsWith("#refresh")) {
 			refresh();
@@ -58,17 +62,21 @@ public class ServerConsole {
 		String id = token[0];
 		String pass = token[1];
 
+		/*
 		if (pass.compareTo(dbManager.getPWByID(id)) == 0)
 			sendUser(dbManager.getUserByID(id));
-		else
-			sendString("#err");
+		else*/
+		sendString("#err");
 	}
 
 	private void register(String msg) {
+		
+		
 		String[] token = msg.split("$");
 		String id = token[0];
 		String pass = token[1];
 
+		/*
 		if (dbManager.getPWByID(id) == null)
 			sendString("#err");
 
@@ -79,6 +87,8 @@ public class ServerConsole {
 
 			sendString("#fin");
 		}
+		*/
+		sendString("#fin");
 	}
 
 	public void refresh() {
@@ -98,7 +108,7 @@ public class ServerConsole {
 	}
 
 	public void post(Posts p) {
-
+		p.toString();
 	}
 
 	public void delete(String msg) {

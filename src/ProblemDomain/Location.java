@@ -1,18 +1,9 @@
 package ProblemDomain;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-
-/**
- * @author jm
- * 
- * tour information that get from TourAPI
- * catList(index) 	: Big(0), middle(1), small(2) category
- * contentID 		: tour information id
- * contentTypeID 	: tour information type id 
- * title			: tour information title 
- */
-public class Location {
+public class Location implements Serializable {
 	ArrayList<Integer> catList;
 	int contentID;
 	int contentTypeID;
@@ -42,4 +33,12 @@ public class Location {
 	public void setTitle(String title) {
 		this.title = title;
 	}
+	
+	@Override
+	public String toString() {
+		return "Location [catList=" + catList + ", contentID=" + contentID + ", contentTypeID=" + contentTypeID
+				+ ", title=" + title + "]";
+	}
+	
+	
 }

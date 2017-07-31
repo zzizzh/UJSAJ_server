@@ -1,16 +1,9 @@
 package ProblemDomain;
 
 import java.awt.Image;
+import java.io.Serializable;
 
-/**
- * @author jm
- * 
- * Posts data writed by User
- * Location 	: tour information
- * url 			: youtube movie url
- * artist		: 
- */
-public class Posts {
+public class Posts implements Serializable{
 
 	Location locationInfo;
 	String url;
@@ -23,6 +16,15 @@ public class Posts {
 	
 	long createTime;
 	Image image;
+	
+	public Posts(){
+		locationInfo = new Location();
+		url = "http://mwultong.blogspot.com/2006/11/java-user-input-string-number.html";
+		artist = "아이유";
+		song = "밤편지";
+		comment = "테스트";
+		
+	}
 	
 	public Location getLocationInfo() {
 		return locationInfo;
@@ -78,6 +80,10 @@ public class Posts {
 	public void setImage(Image image) {
 		this.image = image;
 	}
-	
-	
+	@Override
+	public String toString() {
+		return "Posts [locationInfo=" + locationInfo + ", url=" + url + ", artist=" + artist + ", song=" + song
+				+ ", comment=" + comment + ", postsID=" + postsID + ", like=" + like + ", createTime=" + createTime
+				+ ", image=" + image + "]";
+	}
 }
