@@ -63,8 +63,12 @@
 ● 서버->클라이언트 : #fin
 
 ■ 포스트 좋아요 취소 (disLike)
-● 클라이언트->서버 : (string) #unlike$(int)index
-■ 서버->클라이언트 : #fin
+● 클라이언트->서버 : (string) #dislike$(int)index
+● 서버->클라이언트 : #fin
+
+■ 유저정보업데이트 (updateUser)
+● 클라이언트->서버 : (string) #updateUser
+● 서버->클라이언트 : User
 < 데이터 클래스 >
 < 서버/DB 함수 >
 
@@ -88,11 +92,14 @@ ServerConsole
 - register(String msg) 
 - refresh()
 - morePosts()
-- myLike()
-- moreLike()
+- myLike(String msg)
+- moreLike(String msg)
 - posts(Posts p)
+- like(String msg)
+- dislike(String msg)
+- updateUser()
 - sendUser(User u)
 - sendPostsList(PostsList p)
-- sendString(String s)
+- sendString(String msg)
 
 < 안드로이드 함수 >
