@@ -2,8 +2,10 @@ package PhysicalArchitecture;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.util.ArrayList;
 
 import DB.DBManager;
+import Foundation.PostsList;
 import ProblemDomain.Posts;
 import ProblemDomain.User;
 
@@ -12,26 +14,29 @@ public class ServerConsole {
 	private ObjectOutputStream objOutput;
 	private DBManager dbManager;
 
+	private int likeCnt = 0;
+	private User user;
+	
 	public ServerConsole(ObjectOutputStream objout) {
 	//	dbManager = new DBManager();
 		objOutput = objout;
 	}
 
 	/*
-	 * Å¬¶óÀÌ¾ğÆ®¿¡¼­ ¹ŞÀº ¸í·É¾î¸¦ Ã³¸®ÇÏ´Â ÇÔ¼ö ¸í·É¾î´Â #À¸·Î ½ÃÀÛÇÏ°í $·Î ÅäÅ«À» ±¸ºĞÇÑ´Ù.
+	 * í´ë¼ì´ì–¸íŠ¸ì—ì„œ ë°›ì€ ëª…ë ¹ì–´ë¥¼ ì²˜ë¦¬í•˜ëŠ” í•¨ìˆ˜ ëª…ë ¹ì–´ëŠ” #ìœ¼ë¡œ ì‹œì‘í•˜ê³  $ë¡œ í† í°ì„ êµ¬ë¶„í•œë‹¤.
 	 */
 	public void handleMeg(String msg) {
-		System.out.println("Å¬¶óÀÌ¾ğÆ®·ÎºÎÅÍ ¹ŞÀº ¹®ÀÚ¿­ : " + msg);
+		System.out.println("í´ë¼ì´ì–¸íŠ¸ë¡œë¶€í„° ë°›ì€ ë¬¸ìì—´ : " + msg);
 		
 		if (msg.startsWith("#register")) {
-			System.out.println("µî·Ï");
+			System.out.println("ë“±ë¡");
 			msg = msg.substring(9);
 			
 			register(msg);
 		}
 
 		else if (msg.startsWith("#login")) {
-			System.out.println("·Î±×¾È");
+			System.out.println("ë¡œê·¸ì¸");
 			
 			msg = msg.substring(7);
 			login(msg);
@@ -42,7 +47,10 @@ public class ServerConsole {
 		} else if (msg.startsWith("#refresh")) {
 			refresh();
 		} else if (msg.startsWith("#myLike")) {
-			myLike();
+			msg = msg.substring(8);
+			
+			myLike(Integer.parseInt(msg));
+			
 		} else if (msg.startsWith("#moreLike")) {
 			moreLike();
 		} else if (msg.startsWith("#post")) {
@@ -58,53 +66,75 @@ public class ServerConsole {
 	// ----------------function------------//
 
 	private void login(String msg) {
-		String[] token = msg.split("$");
+		System.out.println(msg);
+		String[] token = msg.split("%");
 		String id = token[0];
 		String pass = token[1];
 
-		/*
-		if (pass.compareTo(dbManager.getPWByID(id)) == 0)
-			sendUser(dbManager.getUserByID(id));
-		else*/
-		sendString("#err");
+		System.out.println("id : " + token[0] + "/ pass : " + token[1]);
+		
+		if (pass.compareTo(dbManager.getPWByID(id)) == 0){
+			user = dbManager.getUserByID(id);
+			sendUser(user);
+		}
+		else
+			sendString("#err");
 	}
 
 	private void register(String msg) {
-		
-		
-		String[] token = msg.split("$");
+		String[] token = msg.split("%");
 		String id = token[0];
 		String pass = token[1];
-
-		/*
+		
 		if (dbManager.getPWByID(id) == null)
 			sendString("#err");
 
 		else {
-			User user = new User(dbManager.userIndex, id, pass);
+			User user = new User(dbManager.getUserIndex(), id, pass);
 
 			dbManager.insertUser(user);
 
 			sendString("#fin");
 		}
-		*/
-		sendString("#fin");
 	}
 
 	public void refresh() {
-		
+		try {
+			PostsList p = new PostsList(dbManager.refreshTimeLine());
+			sendPostsList(p);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	public void morePosts() {
-
+		try {
+			PostsList p = new PostsList(dbManager.getMorePosts());
+			sendPostsList(p);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
-	public void myLike() {
-
+	public void myLike(int userIndex) {
+		ArrayList<Integer> temp = user.getMyList();
+		
+		PostsList p = new PostsList();
+		
+		for(int i=0; i<temp.size(); i++){
+			if(i==10)
+				break;
+			
+			p.addPosts(dbManager.getPostsByIndex(temp.get(i)));
+			likeCnt++;
+		}
+		sendPostsList(p);
 	}
 
 	public void moreLike() {
-
+		
 	}
 
 	public void post(Posts p) {
@@ -112,7 +142,7 @@ public class ServerConsole {
 	}
 
 	public void delete(String msg) {
-		String[] token = msg.split("$");
+		String[] token = msg.split("%");
 		
 		try{
 			int index = Integer.parseInt(token[0]);
@@ -121,6 +151,14 @@ public class ServerConsole {
 			sendString("#err");
 			e.printStackTrace();
 		}	
+	}
+	
+	public void like(){
+		
+	}
+	
+	public void disLike(){
+		
 	}
 
 	// ------------------send---------------//
@@ -137,6 +175,15 @@ public class ServerConsole {
 	private void sendUser(User user) {
 		try {
 			objOutput.writeObject(user);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	private void sendPostsList(PostsList p){
+		try {
+			objOutput.writeObject(p);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

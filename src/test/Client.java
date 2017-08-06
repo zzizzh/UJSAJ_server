@@ -10,8 +10,8 @@ import ProblemDomain.Posts;
 import ProblemDomain.User;
 
 /*
- * client Å¬·¡½º¾È¿¡ 
- * read¿Í writeÇÏ´Â class¸¦ °®°íÀÖÀ½.
+ * client Å¬ï¿½ï¿½ï¿½ï¿½ï¿½È¿ï¿½ 
+ * readï¿½ï¿½ writeï¿½Ï´ï¿½ classï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½.
  * 
  */
 public class Client
@@ -19,13 +19,13 @@ public class Client
 	Socket sock;
 	clientWrite clientW;
 	clientRead clientR;
-	private ClientControl cControl;
+	private static ClientControl cControl;
 
 	public Client(String host, int port)
 	{
 		cControl=new ClientControl();
 		try {
-			System.out.println("-----Å¬¶óÀÌ¾ðÆ®°¡ ½ÇÇàµÇ¾ú½À´Ï´Ù.");
+			System.out.println("-----Å¬ï¿½ï¿½ï¿½Ì¾ï¿½Æ®ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ç¾ï¿½ï¿½ï¿½ï¿½Ï´ï¿½.");
 			sock = new Socket(host, port);
 
 		} catch (IOException e) {
@@ -46,14 +46,14 @@ public class Client
 			clientW.sendToServerPosts((Posts)obj);
 	}
 	
-	public ClientControl getcControl() {
+	static public ClientControl getcControl() {
 		return cControl;
 	}
 	public void setcControl(ClientControl cControl) {
 		this.cControl = cControl;
 	}
 }
-class clientRead extends Thread//¼­¹ö·Î ºÎÅÍ ¸Þ¼¼Áö ¹Þ±â.
+class clientRead extends Thread//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Þ¼ï¿½ï¿½ï¿½ ï¿½Þ±ï¿½.
 {
 	Socket socket;
 	private ClientControl cControl;
@@ -90,7 +90,7 @@ class clientRead extends Thread//¼­¹ö·Î ºÎÅÍ ¸Þ¼¼Áö ¹Þ±â.
 				else if(temp instanceof String)
 				{
 					String line = (String) temp;
-					System.out.println("-----¼­¹ö¿¡¼­¹ÞÀº msg >: "+line);
+					System.out.println("-----ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ msg >: "+line);
 					cControl.addString(line);
 				}
 			}	
@@ -119,7 +119,7 @@ class clientRead extends Thread//¼­¹ö·Î ºÎÅÍ ¸Þ¼¼Áö ¹Þ±â.
 
 }
 
-class clientWrite extends Thread//¼­¹ö·Î ¸Þ¼¼Áö º¸³»±â
+class clientWrite extends Thread//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Þ¼ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 {
 	private Socket socket;
 	private String console;
@@ -141,7 +141,7 @@ class clientWrite extends Thread//¼­¹ö·Î ¸Þ¼¼Áö º¸³»±â
 		try {
 			out = new ObjectOutputStream(socket.getOutputStream());
 
-			while (true) //&ÀüÃ¼ threadÀÇ ¹Ýº¹¹®
+			while (true) //&ï¿½ï¿½Ã¼ threadï¿½ï¿½ ï¿½Ýºï¿½ï¿½ï¿½
 			{			
 				try {
 					Thread.sleep(10);
@@ -149,17 +149,17 @@ class clientWrite extends Thread//¼­¹ö·Î ¸Þ¼¼Áö º¸³»±â
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				while(sendToReadyString==true)//& º¸³¾ÁØºñ°¡ µÉ¶§¸¸ ½ÇÇàµµ·Ï ÇÏ´Â ¹Ýº¹¹®
+				while(sendToReadyString==true)//& ï¿½ï¿½ï¿½ï¿½ï¿½Øºï¿½ ï¿½É¶ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½àµµï¿½ï¿½ ï¿½Ï´ï¿½ ï¿½Ýºï¿½ï¿½ï¿½
 				{
 					out.writeObject(console);
 					sendToReadyString=false;
-					System.out.println("-----server·Î -¸Þ¼¼Áö-Àü¼Û");					
+					System.out.println("-----serverï¿½ï¿½ -ï¿½Þ¼ï¿½ï¿½ï¿½-ï¿½ï¿½ï¿½ï¿½");					
 				}
-				while(sendToReadyPosts==true)//& º¸³¾ÁØºñ°¡ µÉ¶§¸¸ ½ÇÇàµµ·Ï ÇÏ´Â ¹Ýº¹¹®
+				while(sendToReadyPosts==true)//& ï¿½ï¿½ï¿½ï¿½ï¿½Øºï¿½ ï¿½É¶ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½àµµï¿½ï¿½ ï¿½Ï´ï¿½ ï¿½Ýºï¿½ï¿½ï¿½
 				{
 					out.writeObject(postsConsole);
 					sendToReadyPosts=false;
-					System.out.println("-----server·Î -list-Àü¼Û");					
+					System.out.println("-----serverï¿½ï¿½ -list-ï¿½ï¿½ï¿½ï¿½");					
 				}
 				
 			}		

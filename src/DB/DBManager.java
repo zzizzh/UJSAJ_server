@@ -34,8 +34,8 @@ public class DBManager {
 
 	int userIndex;
 	int postsIndex;
-	int recentIndex; // 어플 켰을시 게시물 갯수
-	int seeIndex; // 자신이 본 인덱스
+	int recentIndex; // �뼱�뵆 耳곗쓣�떆 寃뚯떆臾� 媛��닔
+	int seeIndex; // �옄�떊�씠 蹂� �씤�뜳�뒪
 	String MongoDB_IP = "127.0.0.1";
 	// String MongoDB_IP = "222.104.203.106";
 	int MongoDB_PORT = 27017;
@@ -124,23 +124,47 @@ public class DBManager {
 	public void insertUser(User user) {
 
 		BasicDBObject document = new BasicDBObject();
-		// index 파트 만들기, 넣기
+		// index 
 		document.put("index", userIndex);
 		userIndex++;
-		// ID 파트 만들기, 넣기
+		// ID 
 		document.put("ID", user.getId());
-		// PW 파트 만들기, 넣기
+		// PW 
 		document.put("PW", user.getPw());
-		// LikeList 파트 만들기, 넣기
+		// LikeList 
 		document.put("LikeList", user.getLikeList());
-		// MyList 파트 만들기, 넣기
+		// MyList 
 		document.put("MyList", user.getMyList());
 
-		// DB에 저장
+		// DB
 		userCollection.insert(document);
 
 	}
 
+	public User getUserByIndex(int index){
+		User user = new User();
+
+		BasicDBObject idQuery = new BasicDBObject();
+		idQuery.put("index", index);
+
+		DBCursor cursorId = userCollection.find(idQuery);
+
+		if (cursorId.hasNext()) {
+			DBObject check = null;
+			check = cursorId.next();
+			if (check != null) {
+				user.setUserIndex((Integer) check.get("index"));
+				user.setUserId((String) check.get("ID"));
+				user.setUserPw((String) check.get("PW"));
+				user.setUserLikeList((ArrayList<Integer>) check.get("LikeList"));
+				user.setUserMyList((ArrayList<Integer>) check.get("MyList"));
+				
+				return user;
+			}
+		}
+		return null;
+	}
+	
 	public void updateList(User user) {
 
 		BasicDBObject updateQuery = new BasicDBObject();
@@ -153,12 +177,12 @@ public class DBManager {
 
 		BasicDBObject searchQuery = new BasicDBObject().append("index", user.getUserIndex());
 
-		// 새로 받은 데이터로 업데이트
+		//
 		userCollection.update(searchQuery, updateQuery);
 
 	}
 
-	// 비밀번호를 이용해 id리턴받기, id중복확인, 로그인에서 필요
+	// 
 	public String getPWByID(String id) {
 		String PW;
 
@@ -180,7 +204,7 @@ public class DBManager {
 		return null;
 	}
 
-	// 아이디를 이용해 유저 객체 받아오기.
+	// 
 	public User getUserByID(String id) {
 
 		User user = new User();
@@ -205,7 +229,7 @@ public class DBManager {
 		return null;
 	}
 
-	// 게시물 쓰면 부르는 메소드
+	//
 	public void insertPosts(Posts posts) {
 
 		BasicDBObject document = new BasicDBObject();
@@ -255,7 +279,7 @@ public class DBManager {
 
 	}
 
-	// 새로받은 데이터로 게시물 업데이트
+	// 
 	public void updatePostsList(Posts posts) {
 
 		BasicDBObject updateQuery = new BasicDBObject();
@@ -280,7 +304,7 @@ public class DBManager {
 		postsCollection.remove(document);
 	}
 
-	// index를 이용해 게시물 리턴
+	// index
 	public Posts getPostsByIndex(int index) {
 
 		Posts posts = new Posts();
@@ -328,7 +352,7 @@ public class DBManager {
 		return null;
 	}
 
-	// index를 이용해 게시물 이미지 불러오기
+	// index
 	public Image getImageByIndex(int index) throws Exception {
 
 		Posts posts = new Posts();
@@ -391,7 +415,7 @@ public class DBManager {
 		document.put("ContentID", location.getContentID());
 		document.put("ContentTypeID", location.getContentTypeID());
 		document.put("Title", location.getTitle());
-		// DB에 저장
+		// DB
 		locationCollection.insert(document);
 
 	}
@@ -461,7 +485,7 @@ public class DBManager {
 		return p;
 	}
 
-	// 0 : 소분류, 1 : 중분류, 2 : 대분류, 3 : 컨텐츠아이디
+	
 	public ArrayList<Posts> getPostsByOption(int option, int value) {
 		ArrayList<Integer> i = new ArrayList<Integer>();
 		ArrayList<Posts> p = new ArrayList<Posts>();

@@ -10,6 +10,10 @@ public class PostsList {
 	public PostsList() {
 		postsList = new ArrayList<Posts>();
 	}
+	
+	public PostsList(ArrayList<Posts> p) {
+		postsList = p;
+	}
 
 	public void addPosts(Posts p) {
 		postsList.add(p);
