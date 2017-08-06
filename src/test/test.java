@@ -1,19 +1,10 @@
 package test;
-import java.awt.Image;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.util.Iterator;
+import java.util.ArrayList;
 import java.util.Scanner;
 
-import javax.imageio.ImageIO;
-import javax.imageio.ImageReader;
-import javax.imageio.stream.ImageInputStream;
-
 import DB.DBManager;
+import ProblemDomain.Location;
 import ProblemDomain.Posts;
-import ProblemDomain.User;
-import ProblemDomain.*;
 public class test {
 
 	public static void main(String[] args) throws Exception {
@@ -25,17 +16,29 @@ public class test {
 		Posts p = new Posts();
 		Location l = new Location();
 		
-		d.deletePosts(1);
+		ArrayList<Posts> po = new ArrayList<Posts>();
 		
-		/*
 		l.setBigLocation(1);
-		l.setMidLocation(1);
-		l.setSmallLocation(1);
+		l.setMidLocation(123);
+		l.setSmallLocation(12345);
+		
+		po = d.getPostsByLocation(l);
+		
+		for(int i=0;i<po.size();i++){
+			p = po.get(i);
+			System.out.println(p.getPostsIndex());
+		}
+		
+		
+	/*	
+		l.setBigLocation(1234567890);
+		l.setMidLocation(1234567890);
+		l.setSmallLocation(1234567890);
 		
 		p.setLocationInfo(l);
 		
 		d.insertPosts(p);
-		*/
+*/
 		
 /*
 		String string = keyboard.next();

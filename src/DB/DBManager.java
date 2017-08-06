@@ -37,13 +37,13 @@ public class DBManager {
 	int recentIndex; // 어플 켰을시 게시물 갯수
 	int seeIndex; // 자신이 본 인덱스
 	String MongoDB_IP = "127.0.0.1";
-	String MongoDB_IP = "222.104.203.106";
+	// String MongoDB_IP = "222.104.203.106";
 	int MongoDB_PORT = 27017;
 	String DB_NAME = "db";
 
 	MongoClient mongoClient = new MongoClient(new ServerAddress(MongoDB_IP, MongoDB_PORT));
 	DB db = mongoClient.getDB(DB_NAME);
-	DBCollection userCollection = db.getCollection("User");
+	public DBCollection userCollection = db.getCollection("User");
 	DBCollection postsCollection = db.getCollection("Posts");
 	DBCollection locationCollection = db.getCollection("Location");
 
@@ -157,7 +157,6 @@ public class DBManager {
 		userCollection.update(searchQuery, updateQuery);
 
 	}
-	
 
 	// 비밀번호를 이용해 id리턴받기, id중복확인, 로그인에서 필요
 	public String getPWByID(String id) {
@@ -275,12 +274,12 @@ public class DBManager {
 
 	}
 
-	public void deletePosts(int index){
+	public void deletePosts(int index) {
 		DBObject document = new BasicDBObject();
 		document.put("index", index);
 		postsCollection.remove(document);
 	}
-	
+
 	// index를 이용해 게시물 리턴
 	public Posts getPostsByIndex(int index) {
 
@@ -306,13 +305,13 @@ public class DBManager {
 					DBObject checkLoc = null;
 					checkLoc = cursorLoc.next();
 					if (checkLoc != null) {
-						location.setBigLocation((int)checkLoc.get("BigLocation"));
-						location.setMidLocation((int)checkLoc.get("MidLocation"));
-						location.setSmallLocation((int)checkLoc.get("SmallLocation"));
-						location.setContentID((int)checkLoc.get("ContentID"));
-						location.setContentTypeID((int)checkLoc.get("ContentTypeID"));
-						location.setTitle((String)checkLoc.get("Title"));
-						
+						location.setBigLocation((int) checkLoc.get("BigLocation"));
+						location.setMidLocation((int) checkLoc.get("MidLocation"));
+						location.setSmallLocation((int) checkLoc.get("SmallLocation"));
+						location.setContentID((int) checkLoc.get("ContentID"));
+						location.setContentTypeID((int) checkLoc.get("ContentTypeID"));
+						location.setTitle((String) checkLoc.get("Title"));
+
 					}
 				}
 				posts.setLocationInfo(location);
@@ -398,7 +397,131 @@ public class DBManager {
 	}
 
 	public ArrayList<Posts> getPostsByLocation(Location location) {
+		ArrayList<Integer> i = new ArrayList<Integer>();
 		ArrayList<Posts> p = new ArrayList<Posts>();
+
+		BasicDBObject cquery = new BasicDBObject();
+
+		cquery.put("ContentID", location.getContentID());
+
+		DBCursor ccursor = locationCollection.find(cquery);
+		while (ccursor.hasNext() && i.size() < 10) {
+			int index = (int) ccursor.next().get("index");
+			i.add(index);
+		}
+
+		if (i.size() < 10) {
+			BasicDBObject squery = new BasicDBObject();
+
+			squery.put("ContentID", new BasicDBObject("$ne", location.getContentID()));
+			squery.put("SmallLocation", location.getSmallLocation());
+
+			DBCursor cursor = locationCollection.find(squery);
+			while (cursor.hasNext() && i.size() < 10) {
+				int index = (int) cursor.next().get("index");
+				i.add(index);
+			}
+		}
+
+		if (i.size() < 10) {
+			BasicDBObject mquery = new BasicDBObject();
+
+			mquery.put("ContentID", new BasicDBObject("$ne", location.getContentID()));
+			mquery.put("SmallLocation", new BasicDBObject("$ne", location.getSmallLocation()));
+			mquery.put("MidLocation", location.getMidLocation());
+
+			DBCursor mcursor = locationCollection.find(mquery);
+			while (mcursor.hasNext() && i.size() < 10) {
+				int index = (int) mcursor.next().get("index");
+				i.add(index);
+			}
+
+		}
+		if (i.size() < 10) {
+			BasicDBObject bquery = new BasicDBObject();
+
+			bquery.put("ContentID", new BasicDBObject("$ne", location.getContentID()));
+			bquery.put("SmallLocation", new BasicDBObject("$ne", location.getSmallLocation()));
+			bquery.put("MidLocation", new BasicDBObject("$ne", location.getMidLocation()));
+			bquery.put("BigLocation", location.getBigLocation());
+
+			DBCursor bcursor = locationCollection.find(bquery);
+			while (bcursor.hasNext() && i.size() < 10) {
+				int index = (int) bcursor.next().get("index");
+				i.add(index);
+			}
+
+		}
+
+		for (int j = 0; j < i.size(); j++) {
+			Posts posts = this.getPostsByIndex(i.get(j));
+			p.add(posts);
+		}
+
+		return p;
+	}
+
+	// 0 : 소분류, 1 : 중분류, 2 : 대분류, 3 : 컨텐츠아이디
+	public ArrayList<Posts> getPostsByOption(int option, int value) {
+		ArrayList<Integer> i = new ArrayList<Integer>();
+		ArrayList<Posts> p = new ArrayList<Posts>();
+
+		if (option == 0) {
+			BasicDBObject cquery = new BasicDBObject();
+
+			cquery.put("SmallLocation", value);
+
+			DBCursor ccursor = locationCollection.find(cquery);
+
+			while (ccursor.hasNext() && i.size() < 10) {
+				int index = (int) ccursor.next().get("index");
+				i.add(index);
+			}
+
+		} else if (option == 1) {
+			BasicDBObject cquery = new BasicDBObject();
+
+			cquery.put("MidLocation", value);
+
+			DBCursor ccursor = locationCollection.find(cquery);
+
+			while (ccursor.hasNext() && i.size() < 10) {
+				int index = (int) ccursor.next().get("index");
+				i.add(index);
+			}
+		} else if (option == 2) {
+			BasicDBObject cquery = new BasicDBObject();
+
+			cquery.put("BigLocation", value);
+
+			DBCursor ccursor = locationCollection.find(cquery);
+
+			while (ccursor.hasNext() && i.size() < 10) {
+				int index = (int) ccursor.next().get("index");
+				i.add(index);
+			}
+		} else if (option == 3) {
+			BasicDBObject cquery = new BasicDBObject();
+
+			cquery.put("ContentID", value);
+
+			DBCursor ccursor = locationCollection.find(cquery);
+
+			while (ccursor.hasNext() && i.size() < 10) {
+				int index = (int) ccursor.next().get("index");
+				i.add(index);
+			}
+
+		}
+
+		else {
+			return null;
+		}
+
+		for (int j = 0; j < i.size(); j++) {
+			Posts posts = this.getPostsByIndex(i.get(j));
+			p.add(posts);
+		}
 
 		return p;
 	}

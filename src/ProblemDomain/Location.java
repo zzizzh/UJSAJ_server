@@ -8,7 +8,6 @@ public class Location implements Serializable{
 	int midLocation;
 	int smallLocation;
 
-	ArrayList<Integer> catList;
 	int contentID;
 	int contentTypeID;
 	String title;

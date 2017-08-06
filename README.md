@@ -1,4 +1,4 @@
-# UJSAJ_server
+﻿# UJSAJ_server
 
 
 < 프로젝트 주요 과제 ? 서버/DB>
@@ -67,4 +67,19 @@
 ■ 서버<-클라이언트 : #fin
 < 데이터 클래스 >
 < 서버/DB 함수 >
+DBManager
+- getUserIndex() return userIndex
+- getPostsIndex() return postsIndex
+- refreshTimeLine() return ArrayList<Posts>
+- getMorePosts() return ArrayList<Posts>
+- insertUser(User user)
+- getPWByID(String id) return String(PW)
+- getUserByID(String id) return User
+- insertPosts(Posts posts)
+- deletePosts(int index)
+- getPostsByIndex(int index) return Posts
+- getPostsByLocation(Location location) return ArrayList<Posts>
+- getPostsByOption(int option, int value) return ArrayList<Posts>
+0 : 소분류, 1 : 중분류, 2 : 대분류, 3 : 콘텐츠아이디
+
 < 안드로이드 함수 >
