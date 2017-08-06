@@ -29,44 +29,35 @@ public class ServerConsole {
 		System.out.println("클라이언트로부터 받은 문자열 : " + msg);
 		
 		if (msg.startsWith("#register")) {
-			System.out.println("등록");
-			msg = msg.substring(9);
-			
 			register(msg);
 		}
-
 		else if (msg.startsWith("#login")) {
-			System.out.println("로그인");
-			
-			msg = msg.substring(7);
 			login(msg);
-			
 		} else if (msg.startsWith("#morePosts")) {
-			
 			morePosts();
 		} else if (msg.startsWith("#refresh")) {
 			refresh();
 		} else if (msg.startsWith("#myLike")) {
-			msg = msg.substring(8);
-			
-			myLike(Integer.parseInt(msg));
-			
+			myLike();
 		} else if (msg.startsWith("#moreLike")) {
 			moreLike();
 		} else if (msg.startsWith("#post")) {
 			sendString("#ready");
 		} else if (msg.startsWith("#delete")) {
-			msg = msg.substring(7);
 			delete(msg);
 		} else if (msg.startsWith("#like")) {
-
+			like(msg);
+		} else if (msg.startsWith("#dislike")) {
+			dislike(msg);
+		} else if (msg.startsWith("#updateuser")) {
+			updateUser();
 		} 
 	}
 
 	// ----------------function------------//
 
 	private void login(String msg) {
-		System.out.println(msg);
+		msg = msg.substring(7);
 		String[] token = msg.split("%");
 		String id = token[0];
 		String pass = token[1];
@@ -82,11 +73,12 @@ public class ServerConsole {
 	}
 
 	private void register(String msg) {
+		msg = msg.substring(10);
 		String[] token = msg.split("%");
 		String id = token[0];
 		String pass = token[1];
 		
-		if (dbManager.getPWByID(id) == null)
+		if (dbManager.getPWByID(id) != null)
 			sendString("#err");
 
 		else {
@@ -118,7 +110,9 @@ public class ServerConsole {
 		}
 	}
 
-	public void myLike(int userIndex) {
+	public void myLike() {
+		likeCnt = 0;
+		
 		ArrayList<Integer> temp = user.getMyList();
 		
 		PostsList p = new PostsList();
@@ -134,33 +128,67 @@ public class ServerConsole {
 	}
 
 	public void moreLike() {
+		ArrayList<Integer> temp = user.getMyList();
 		
+		PostsList p = new PostsList();
+		
+		for(int i=likeCnt; i<temp.size(); i++){
+			if(i==likeCnt+10)
+				break;
+			
+			p.addPosts(dbManager.getPostsByIndex(temp.get(i)));
+			likeCnt++;
+		}
+		sendPostsList(p);
 	}
 
 	public void post(Posts p) {
-		p.toString();
+		dbManager.insertPosts(p);
 	}
 
 	public void delete(String msg) {
+		msg = msg.substring(9);
 		String[] token = msg.split("%");
-		
 		try{
 			int index = Integer.parseInt(token[0]);
-			
 		}catch(NumberFormatException e){
 			sendString("#err");
 			e.printStackTrace();
 		}	
 	}
 	
-	public void like(){
+	public void like(String msg){
+		msg = msg.substring(6);
+		int index = Integer.parseInt(msg);
 		
+		user.getLikeList().add(index);
+		
+		dbManager.updateUser(user);
+		
+		sendUser(user);
 	}
 	
-	public void disLike(){
+	public void dislike(String msg){
+		msg = msg.substring(9);
+		int index = Integer.parseInt(msg);
+		ArrayList<Integer> temp = user.getLikeList();
 		
+		for(int i=0; i<temp.size(); i++)
+			if(temp.get(i) == index)
+				temp.remove(i);
+		
+		dbManager.updateUser(user);
+		
+		sendUser(user);
 	}
 
+	/*
+	 * request for updating user data in android
+	 */
+	public void updateUser(){
+		sendUser(user);
+	}
+	
 	// ------------------send---------------//
 
 	private void sendString(String str) {

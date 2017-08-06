@@ -49,4 +49,11 @@ public class Location implements Serializable{
 	public void setTitle(String title) {
 		this.title = title;
 	}
+	@Override
+	public String toString() {
+		return "Location [bigLocation=" + bigLocation + ", midLocation=" + midLocation + ", smallLocation="
+				+ smallLocation + ", contentID=" + contentID + ", contentTypeID=" + contentTypeID + ", title=" + title
+				+ "]";
+	}
+	
 }

@@ -117,5 +117,12 @@ public class Posts implements Serializable{
 	public void setIImage(Image image){
 		this.Iimage = image;
 	}
+
+	@Override
+	public String toString() {
+		return "Posts [index=" + index + ", locationInfo=" + locationInfo + ", url=" + url + ", artist=" + artist
+				+ ", song=" + song + ", comment=" + comment + ", postsID=" + postsID + ", like=" + like
+				+ ", createTime=" + createTime + ", Fimage=" + Fimage + ", Iimage=" + Iimage + "]";
+	}
 	
 }

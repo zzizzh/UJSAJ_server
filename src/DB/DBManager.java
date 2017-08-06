@@ -165,7 +165,7 @@ public class DBManager {
 		return null;
 	}
 	
-	public void updateList(User user) {
+	public void updateUser(User user) {
 
 		BasicDBObject updateQuery = new BasicDBObject();
 
@@ -396,7 +396,6 @@ public class DBManager {
 
 			}
 		}
-
 		return null;
 	}
 
@@ -421,6 +420,7 @@ public class DBManager {
 	}
 
 	public ArrayList<Posts> getPostsByLocation(Location location) {
+	
 		ArrayList<Integer> i = new ArrayList<Integer>();
 		ArrayList<Posts> p = new ArrayList<Posts>();
 
@@ -433,7 +433,6 @@ public class DBManager {
 			int index = (int) ccursor.next().get("index");
 			i.add(index);
 		}
-
 		if (i.size() < 10) {
 			BasicDBObject squery = new BasicDBObject();
 
@@ -446,7 +445,6 @@ public class DBManager {
 				i.add(index);
 			}
 		}
-
 		if (i.size() < 10) {
 			BasicDBObject mquery = new BasicDBObject();
 
@@ -459,7 +457,6 @@ public class DBManager {
 				int index = (int) mcursor.next().get("index");
 				i.add(index);
 			}
-
 		}
 		if (i.size() < 10) {
 			BasicDBObject bquery = new BasicDBObject();
@@ -474,17 +471,13 @@ public class DBManager {
 				int index = (int) bcursor.next().get("index");
 				i.add(index);
 			}
-
 		}
-
 		for (int j = 0; j < i.size(); j++) {
 			Posts posts = this.getPostsByIndex(i.get(j));
 			p.add(posts);
 		}
-
 		return p;
 	}
-
 	
 	public ArrayList<Posts> getPostsByOption(int option, int value) {
 		ArrayList<Integer> i = new ArrayList<Integer>();
@@ -501,7 +494,6 @@ public class DBManager {
 				int index = (int) ccursor.next().get("index");
 				i.add(index);
 			}
-
 		} else if (option == 1) {
 			BasicDBObject cquery = new BasicDBObject();
 
@@ -535,9 +527,7 @@ public class DBManager {
 				int index = (int) ccursor.next().get("index");
 				i.add(index);
 			}
-
 		}
-
 		else {
 			return null;
 		}
@@ -546,8 +536,6 @@ public class DBManager {
 			Posts posts = this.getPostsByIndex(i.get(j));
 			p.add(posts);
 		}
-
 		return p;
 	}
-
 }

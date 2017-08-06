@@ -59,5 +59,9 @@ public class User implements Serializable{
 	public void setUserMyList(ArrayList<Integer> myList){
 		this.myList = myList;
 	}
-	
+	@Override
+	public String toString() {
+		return "User [index=" + index + ", id=" + id + ", pw=" + pw + ", likeList=" + likeList + ", myList=" + myList
+				+ "]";
+	}
 }

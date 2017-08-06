@@ -189,5 +189,4 @@ class clientWrite extends Thread//������ �޼��� ����
 		postsConsole=posts;
 		sendToReadyPosts=true;
 	}
-
 }
