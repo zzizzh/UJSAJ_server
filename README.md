@@ -1,7 +1,5 @@
-<<<<<<< HEAD
+
 ﻿# UJSAJ_server
-=======
->>>>>>> ff4c128b6c75d97cac0c8ab861f0c3a55a4de3ec
 
 < 프로젝트 주요 과제 – 서버/DB>
 
@@ -28,47 +26,48 @@
 ■ 해당 Location에 게시글이 없을 경우에 같은 카테고리(소->중->대 순서)나 같은 콘텐츠타입의 ID를 갖고있는 Location의 게시글을 보내줘야 한다.
 
 < 서버-클라이언트 간 명령 명세 >
-■ 로그인
+■ 로그인(login)
 ● 클라이언트->서버 : (string) #login$id$pass / 
 ● 서버->클라이언트 : (string) #err or User
 
-■ 회원가입
+■ 회원가입(register)
 ● 클라이언트->서버 : (string) #register$id$password
 ● 서버->클라이언트 : #fin or #err
 
-■ 타임라인 포스트 요청(시간, 위치)
+■ 타임라인 포스트 요청(시간, 위치) (morePosts)
 ● 클라이언트->서버 : (string) #morePosts
 ● 서버->클라이언트 : ArrayList<Posts>
 
-■ 타임라인 포스트 새로고침(시간, 위치)
+■ 타임라인 포스트 새로고침(시간, 위치) (refresh)
 ● 클라이언트->서버 : (string) #refresh
 ● 서버->클라이언트 : ArrayList<Posts>
 
-■ 내가 좋아요 한 포스트 요청(처음)
-● 클라이언트->서버 : (string) #myLike
+■ 내가 좋아요 한 포스트 요청(처음) (myLike)
+● 클라이언트->서버 : (string) #userIndex
 ● 서버->클라이언트 : ArrayList<Posts>
 
-■ 내가 좋아요 한 포스트 요청(추가)
+■ 내가 좋아요 한 포스트 요청(추가) (moreLike)
 ● 클라이언트->서버 : (string) #moreLike
 ● 서버->클라이언트 : ArrayList<Posts>
 
-■ 포스트 쓰기(포스트 저장)
+■ 포스트 쓰기(포스트 저장) (Post)
 ● 클라이언트->서버 : (string) #post / 서버->클라이언트 : #ready
 ● 클라이언트->서버 : Posts
 
-■ 내가 쓴 포스트 삭제
+■ 내가 쓴 포스트 삭제 (delete)
 ● 클라이언트->서버 : (string) #delete$(int)index
 ● 서버->클라이언트 : #fin
 
-■ 포스트 좋아요
+■ 포스트 좋아요 (like)
 ● 클라이언트->서버 : (string) #like$(int)index
 ● 서버->클라이언트 : #fin
 
-■ 포스트 좋아요 취소
+■ 포스트 좋아요 취소 (disLike)
 ● 클라이언트->서버 : (string) #unlike$(int)index
 ■ 서버->클라이언트 : #fin
 < 데이터 클래스 >
 < 서버/DB 함수 >
+
 DBManager
 - getUserIndex() return userIndex
 - getPostsIndex() return postsIndex
@@ -83,5 +82,17 @@ DBManager
 - getPostsByLocation(Location location) return ArrayList<Posts>
 - getPostsByOption(int option, int value) return ArrayList<Posts>
 0 : 소분류, 1 : 중분류, 2 : 대분류, 3 : 콘텐츠아이디
+
+ServerConsole
+- login(String msg) 
+- register(String msg) 
+- refresh()
+- morePosts()
+- myLike()
+- moreLike()
+- posts(Posts p)
+- sendUser(User u)
+- sendPostsList(PostsList p)
+- sendString(String s)
 
 < 안드로이드 함수 >
