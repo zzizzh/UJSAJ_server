@@ -67,7 +67,7 @@ public class ClientControl {
 	}
 
 	/*
-	 * 
+	 * 로그인한 뒤 서버에서 받
 	 */
 	public void setMe(User user) {
 		me = user;
@@ -81,8 +81,15 @@ public class ClientControl {
 		stringList = new ArrayList<String>();
 		timeLine = new ArrayList<Posts>();
 		myPostsList = new ArrayList<Posts>();
-		stringList = new ArrayList<String>();
 
 		me = null;
+	}
+	
+	public void resetTimeLine(){
+		timeLine = new ArrayList<Posts>();
+	}
+	
+	public void resetMyPostsList(){
+		myPostsList = new ArrayList<Posts>();
 	}
 }

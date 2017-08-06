@@ -38,9 +38,12 @@ public class Client
 		clientR.start();
 	}
 
-	public void sendToServer(String msg)
+	public void sendToServer(Object obj)
 	{
-		clientW.sendToServer(msg);
+		if(obj instanceof String)
+			clientW.sendToServer((String)obj);
+		else if(obj instanceof Posts)
+			clientW.sendToServerPosts((Posts)obj);
 	}
 	
 	public ClientControl getcControl() {
@@ -84,10 +87,10 @@ class clientRead extends Thread//서버로 부터 메세지 받기.
 					
 				}
 				
-				else
+				else if(temp instanceof String)
 				{
 					String line = (String) temp;
-					System.out.println("-----서버로 받은 msg >: "+line);
+					System.out.println("-----서버에서받은 msg >: "+line);
 					cControl.addString(line);
 				}
 			}	
@@ -121,18 +124,15 @@ class clientWrite extends Thread//서버로 메세지 보내기
 	private Socket socket;
 	private String console;
 	private Posts postsConsole;
-	private User userConsole;
 	
 	private boolean sendToReadyString;
 	private boolean sendToReadyPosts;
-	private boolean sendToReadyUser;
 	
 	public clientWrite(Socket socket)
 	{
 		this.socket=socket;
 		sendToReadyString=false;
 		sendToReadyPosts=false;
-		sendToReadyUser=false;
 	}
 	public void run()
 	{
@@ -161,12 +161,6 @@ class clientWrite extends Thread//서버로 메세지 보내기
 					sendToReadyPosts=false;
 					System.out.println("-----server로 -list-전송");					
 				}
-				while(sendToReadyUser==true)//& 보낼준비가 될때만 실행도록 하는 반복문
-				{
-					out.writeObject(userConsole);
-					sendToReadyUser=false;
-					System.out.println("-----server로 -room-전송");					
-				}
 				
 			}		
 		} 
@@ -194,11 +188,6 @@ class clientWrite extends Thread//서버로 메세지 보내기
 	{
 		postsConsole=posts;
 		sendToReadyPosts=true;
-	}
-	public void sendToServerRoom(User user)
-	{
-		userConsole=user;
-		sendToReadyUser=true;
 	}
 
 }
