@@ -1,9 +1,9 @@
 package test;
-import java.util.ArrayList;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.util.Scanner;
 
 import DB.DBManager;
-import ProblemDomain.Location;
 import ProblemDomain.Posts;
 public class test {
 
@@ -13,23 +13,18 @@ public class test {
 
 		Scanner keyboard = new Scanner(System.in);
 		
-		Posts p = new Posts();
-		Location l = new Location();
+		//Posts p = new Posts();
+		//Location l = new Location();
 		
-		ArrayList<Posts> po = new ArrayList<Posts>();
-		
-		l.setBigLocation(1);
-		l.setMidLocation(123);
-		l.setSmallLocation(12345);
-		
-		po = d.getPostsByLocation(l);
-		
-		for(int i=0;i<po.size();i++){
-			p = po.get(i);
-			System.out.println(p.getPostsIndex());
-		}
-		
-		
+		Posts p1 = new Posts(d.getPostsIndex());		
+		File image1 = new File("C:\\Users\\안준영\\Desktop\\DSC00565.jpg");
+		p1.setFImage(image1);
+		d.insertPosts(p1);
+		byte[] arr = d.getImageByIndex(22);
+		System.out.println(arr);
+		FileOutputStream fos = new FileOutputStream("C:\\Users\\안준영\\Desktop\\DSC00565new.jpg");
+		fos.write(arr);
+		fos.close();
 	/*	
 		l.setBigLocation(1234567890);
 		l.setMidLocation(1234567890);

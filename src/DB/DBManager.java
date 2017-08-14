@@ -13,6 +13,7 @@ import java.util.Iterator;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
+import javax.swing.ImageIcon;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
@@ -73,27 +74,43 @@ public class DBManager {
 	public ArrayList<Posts> refreshTimeLine() throws Exception {
 		ArrayList<Posts> P = new ArrayList<Posts>();
 		int dbIndex = (int) postsCollection.count();
-
-		if (recentIndex < dbIndex) {
-			if (dbIndex - recentIndex <= 10) {
-				for (int i = 0; i < dbIndex - recentIndex; i++) {
-					recentIndex++;
+		System.out.println(dbIndex);
+		int num = recentIndex;
+		System.out.println(num);
+		if (num < dbIndex) {
+		
+			if (dbIndex - num < 10) {
+				for (int i = 0; i < dbIndex - num; i++) {
+					
 					Posts posts = this.getPostsByIndex(recentIndex);
-					posts.setIImage(this.getImageByIndex(recentIndex));
+					byte[] arr = this.getImageByIndex(recentIndex);
+					
+					if (arr != null) {
+						posts.setIImage(arr);	
+					}else{
+						posts.setIImage(null);
+					}
+					
+					// posts.setIImage(this.getImageByIndex(recentIndex));
 					P.add(posts);
+					recentIndex++;
 				}
 			} else {
 				for (int i = 0; i < 10; i++) {
-					recentIndex++;
+					
 					Posts posts = this.getPostsByIndex(recentIndex);
-					posts.setIImage(this.getImageByIndex(recentIndex));
+					byte[] arr = this.getImageByIndex(recentIndex);
+					if (arr != null) {
+						posts.setIImage(arr);
+					} 
+					else{
+						posts.setIImage(null);
+					}
+					// posts.setIImage(this.getImageByIndex(recentIndex));
 					P.add(this.getPostsByIndex(recentIndex));
+					recentIndex++;
 				}
 			}
-		}
-
-		else {
-			return null;
 		}
 
 		return P;
@@ -102,18 +119,35 @@ public class DBManager {
 	public ArrayList<Posts> getMorePosts() throws Exception {
 		ArrayList<Posts> p = new ArrayList<Posts>();
 
+		int k = seeIndex;
 		if (seeIndex < 10) {
-			for (int i = 0; i < seeIndex; i++) {
+			for (int i = 0; i < k; i++) {
+				
 				seeIndex--;
 				Posts posts = this.getPostsByIndex(seeIndex);
-				posts.setIImage(this.getImageByIndex(seeIndex));
+				byte[] arr = this.getImageByIndex(seeIndex);
+				if (arr != null) {
+					posts.setIImage(arr);
+				} else {
+					posts.setIImage(null);
+				}
+			
+				// posts.setIImage(this.getImageByIndex(seeIndex));
 				p.add(posts);
 			}
 		} else {
 			for (int i = 0; i < 10; i++) {
+				
 				seeIndex--;
 				Posts posts = this.getPostsByIndex(seeIndex);
-				posts.setIImage(this.getImageByIndex(seeIndex));
+				byte[] arr = this.getImageByIndex(seeIndex);
+				if (arr != null) {
+					posts.setIImage(arr);
+				} else {
+					posts.setIImage(null);
+				}
+
+				// posts.setIImage(this.getImageByIndex(seeIndex));
 				p.add(posts);
 			}
 		}
@@ -124,16 +158,16 @@ public class DBManager {
 	public void insertUser(User user) {
 
 		BasicDBObject document = new BasicDBObject();
-		// index 
+		// index
 		document.put("index", userIndex);
 		userIndex++;
-		// ID 
+		// ID
 		document.put("ID", user.getId());
-		// PW 
+		// PW
 		document.put("PW", user.getPw());
-		// LikeList 
+		// LikeList
 		document.put("LikeList", user.getLikeList());
-		// MyList 
+		// MyList
 		document.put("MyList", user.getMyList());
 
 		// DB
@@ -141,7 +175,7 @@ public class DBManager {
 
 	}
 
-	public User getUserByIndex(int index){
+	public User getUserByIndex(int index) {
 		User user = new User();
 
 		BasicDBObject idQuery = new BasicDBObject();
@@ -158,13 +192,13 @@ public class DBManager {
 				user.setUserPw((String) check.get("PW"));
 				user.setUserLikeList((ArrayList<Integer>) check.get("LikeList"));
 				user.setUserMyList((ArrayList<Integer>) check.get("MyList"));
-				
+
 				return user;
 			}
 		}
 		return null;
 	}
-	
+
 	public void updateUser(User user) {
 
 		BasicDBObject updateQuery = new BasicDBObject();
@@ -182,7 +216,7 @@ public class DBManager {
 
 	}
 
-	// 
+	//
 	public String getPWByID(String id) {
 		String PW;
 
@@ -204,7 +238,7 @@ public class DBManager {
 		return null;
 	}
 
-	// 
+	//
 	public User getUserByID(String id) {
 
 		User user = new User();
@@ -279,7 +313,7 @@ public class DBManager {
 
 	}
 
-	// 
+	//
 	public void updatePostsList(Posts posts) {
 
 		BasicDBObject updateQuery = new BasicDBObject();
@@ -353,7 +387,7 @@ public class DBManager {
 	}
 
 	// index
-	public Image getImageByIndex(int index) throws Exception {
+	public byte[] getImageByIndex(int index) throws Exception {
 
 		Posts posts = new Posts();
 
@@ -372,6 +406,9 @@ public class DBManager {
 				try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
 
 					GridFSDBFile imageForOutput = gfsPhoto.findOne(Integer.toString(index));
+					if (imageForOutput == null) {
+						return null;
+					}
 					imageForOutput.writeTo(outputStream);
 
 					BufferedImage bimage;
@@ -384,11 +421,8 @@ public class DBManager {
 						ImageReader reader = (ImageReader) iter.next();
 						reader.setInput(iis);
 					}
-					bimage = ImageIO.read(new ByteArrayInputStream(outputStream.toByteArray()));
 
-					newImage = (Image) bimage;
-
-					return newImage;
+					return outputStream.toByteArray();
 
 				} catch (IOException e) {
 					throw new Exception("Cannot retrieve content of gridFsFile [" + index + "]", e);
@@ -420,7 +454,7 @@ public class DBManager {
 	}
 
 	public ArrayList<Posts> getPostsByLocation(Location location) {
-	
+
 		ArrayList<Integer> i = new ArrayList<Integer>();
 		ArrayList<Posts> p = new ArrayList<Posts>();
 
@@ -478,7 +512,7 @@ public class DBManager {
 		}
 		return p;
 	}
-	
+
 	public ArrayList<Posts> getPostsByOption(int option, int value) {
 		ArrayList<Integer> i = new ArrayList<Integer>();
 		ArrayList<Posts> p = new ArrayList<Posts>();
@@ -527,11 +561,10 @@ public class DBManager {
 				int index = (int) ccursor.next().get("index");
 				i.add(index);
 			}
+		} else{
+			return p;
 		}
-		else {
-			return null;
-		}
-
+		
 		for (int j = 0; j < i.size(); j++) {
 			Posts posts = this.getPostsByIndex(i.get(j));
 			p.add(posts);

@@ -13,14 +13,16 @@ public class User implements Serializable{
 		this.index = 0;
 		this.id = null;
 		this.pw = null;
-		this.likeList = null;
-		this.myList = null;
+		this.likeList = new ArrayList<Integer>();
+		this.myList = new ArrayList<Integer>();
 	}
 	public User(int index, String id, String pw){
 		
 		this.index = index;
 		this.id = id;
 		this.pw = pw;
+		this.likeList = new ArrayList<Integer>();
+		this.myList = new ArrayList<Integer>();
 		
 	}
 	

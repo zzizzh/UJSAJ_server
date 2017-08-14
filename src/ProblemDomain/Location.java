@@ -11,7 +11,14 @@ public class Location implements Serializable{
 	int contentID;
 	int contentTypeID;
 	String title;
-	
+	public Location(){
+		bigLocation = 0;
+		midLocation = 0;
+		smallLocation = 0;
+		contentID = 0;
+		contentTypeID = 0;
+		title = null;
+	}
 	public int getBigLocation() {
 		return bigLocation;
 	}

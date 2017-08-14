@@ -1,10 +1,11 @@
 package Foundation;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import ProblemDomain.Posts;
 
-public class PostsList {
+public class PostsList implements Serializable{
 	ArrayList<Posts> postsList;
 	
 	public PostsList() {
@@ -35,6 +36,18 @@ public class PostsList {
 		if (postsList.size() > 0)
 			postsList.remove(i);
 		else
-			System.out.println("»èÁ¦°¡ ºÒ°¡´É ÇÕ´Ï´Ù.");
+			System.out.println("ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ò°ï¿½ï¿½ï¿½ ï¿½Õ´Ï´ï¿½.");
 	}
+
+	@Override
+	public String toString() {
+		String s = new String();
+		for(int i = 0;i<this.size();i++){
+			s += this.getPosts(i).toString();
+			s += "\n";
+		}
+		return s;
+	}
+	
+	
 }

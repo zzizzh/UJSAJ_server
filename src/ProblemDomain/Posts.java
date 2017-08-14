@@ -4,6 +4,8 @@ import java.awt.Image;
 import java.io.File;
 import java.io.Serializable;
 
+import javax.swing.ImageIcon;
+
 public class Posts implements Serializable{
 
 	int index;
@@ -13,16 +15,17 @@ public class Posts implements Serializable{
 	String song;
 	String comment;
 	
+	int userID;
 	int postsID;
 	int like;
 	
 	long createTime;
 	File Fimage;
-	Image Iimage;
+	byte[] Iimage; 
 	
 	public Posts(){
 		this.index = 0;
-		this.locationInfo = null;
+		this.locationInfo = new Location();
 		this.url = null;
 		this.artist = null;
 		this.song = null;
@@ -35,7 +38,7 @@ public class Posts implements Serializable{
 	
 	public Posts(int index){
 		this.index = index;
-		this.locationInfo = null;
+		this.locationInfo = new Location();
 		this.url = null;
 		this.artist = null;
 		this.song = null;
@@ -111,10 +114,10 @@ public class Posts implements Serializable{
 	public void setFImage(File image){
 		this.Fimage = image;
 	}
-	public Image getIImage(){
+	public byte[] getIImage(){
 		return Iimage;
 	}
-	public void setIImage(Image image){
+	public void setIImage(byte[] image){
 		this.Iimage = image;
 	}
 

@@ -1,5 +1,6 @@
 package PhysicalArchitecture;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
@@ -18,7 +19,7 @@ public class ServerConsole {
 	private User user;
 	
 	public ServerConsole(ObjectOutputStream objout) {
-	//	dbManager = new DBManager();
+		dbManager = new DBManager();
 		objOutput = objout;
 	}
 
@@ -66,6 +67,7 @@ public class ServerConsole {
 		
 		if (pass.compareTo(dbManager.getPWByID(id)) == 0){
 			user = dbManager.getUserByID(id);
+			System.out.println("Success!");
 			sendUser(user);
 		}
 		else
@@ -93,6 +95,7 @@ public class ServerConsole {
 	public void refresh() {
 		try {
 			PostsList p = new PostsList(dbManager.refreshTimeLine());
+			System.out.println(p);
 			sendPostsList(p);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -103,6 +106,7 @@ public class ServerConsole {
 	public void morePosts() {
 		try {
 			PostsList p = new PostsList(dbManager.getMorePosts());
+			System.out.println(p);
 			sendPostsList(p);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -124,6 +128,7 @@ public class ServerConsole {
 			p.addPosts(dbManager.getPostsByIndex(temp.get(i)));
 			likeCnt++;
 		}
+		System.out.println(p);
 		sendPostsList(p);
 	}
 
@@ -139,18 +144,27 @@ public class ServerConsole {
 			p.addPosts(dbManager.getPostsByIndex(temp.get(i)));
 			likeCnt++;
 		}
+		System.out.println(p);
 		sendPostsList(p);
 	}
 
 	public void post(Posts p) {
+		p.setPostsIndex(dbManager.getPostsIndex());		
+		File image1 = new File("C:\\Users\\안준영\\Desktop\\DSC00565.jpg");
+		p.setFImage(image1);
 		dbManager.insertPosts(p);
+		
+		System.out.println(p);
 	}
 
 	public void delete(String msg) {
-		msg = msg.substring(9);
+		msg = msg.substring(8);
 		String[] token = msg.split("%");
+		
 		try{
 			int index = Integer.parseInt(token[0]);
+			System.out.println(index);
+			dbManager.deletePosts(index);
 		}catch(NumberFormatException e){
 			sendString("#err");
 			e.printStackTrace();

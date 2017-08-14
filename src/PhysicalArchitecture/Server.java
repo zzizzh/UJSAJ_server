@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import DB.DBManager;
 import ProblemDomain.Posts;
 
-public class Server extends Thread// £¦¼­¹ö¿ÀÇÂÅ¬·¡½º
+public class Server extends Thread// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Å¬ï¿½ï¿½ï¿½ï¿½
 {
 	private ServerSocket server;
 	private int port;
@@ -27,7 +27,7 @@ public class Server extends Thread// £¦¼­¹ö¿ÀÇÂÅ¬·¡½º
 	public void run() {
 		try {
 			server = new ServerSocket(port);
-			System.out.println("Á¢¼ÓÀ» ±â´Ù¸³´Ï´Ù.");
+			System.out.println("ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ù¸ï¿½ï¿½Ï´ï¿½.");
 
 			while (true) {
 				Socket sock = server.accept(); 
@@ -77,7 +77,7 @@ class EchoThread extends Thread {
 	public void run() { 
 		try { 
 			InetAddress inetaddr = sock.getInetAddress();
-			System.out.println(inetaddr.getHostAddress() + " ·ÎºÎÅÍ Á¢¼ÓÇÏ¿´½À´Ï´Ù.");
+			System.out.println(inetaddr.getHostAddress() + " ï¿½Îºï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï¿ï¿½ï¿½ï¿½ï¿½Ï´ï¿½.");
 			serverOutputStream = new ObjectOutputStream(sock.getOutputStream());
 			in = new ObjectInputStream(sock.getInputStream());
 			serverConsole = new ServerConsole(serverOutputStream);
@@ -98,12 +98,12 @@ class EchoThread extends Thread {
 				if(temp instanceof String)
 				{
 					line = (String) temp;
-					System.out.println("-----Å¬¶óÀÌ¾ðÆ®·Î ºÎÅÍ Àü¼Û¹ÞÀº ¹®ÀÚ¿­ : " + line);
+					System.out.println("-----send String message to server : " + line);
 					serverConsole.handleMeg(line);
 				}
 				else if(temp instanceof Posts)
 				{
-					System.out.println("-----Å¬¶óÀÌ¾ðÆ®·Î ºÎÅÍ Àü¼Û¹ÞÀº µ¥ÀÌÅÍ : " + temp.toString());
+					System.out.println("-----send Posts to server : " + temp.toString());
 					serverConsole.post((Posts)temp);
 				}
 				
