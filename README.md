@@ -32,7 +32,7 @@
 
 ■ 회원가입(register)
 ● 클라이언트->서버 : (string) #register$id$password
-● 서버->클라이언트 : #fin or #err
+● 서버->클라이언트 :#fin / #err
 
 ■ 타임라인 포스트 요청(시간, 위치) (morePosts)
 ● 클라이언트->서버 : (string) #morePosts
@@ -42,6 +42,14 @@
 ● 클라이언트->서버 : (string) #refresh
 ● 서버->클라이언트 : ArrayList<Posts>
 
+■ 내가 게시한 포스트 새로고침
+● 클라이언트->서버 : (string) #myPosts
+● 서버->클라이언트 : ArrayList<Posts>
+
+■ 내가 게시한 포스트 요청
+● 클라이언트->서버 : (string) #moreMyPosts
+● 서버->클라이언트 : ArrayList<Posts>
+  
 ■ 내가 좋아요 한 포스트 요청(처음) (myLike)
 ● 클라이언트->서버 : (string) #userIndex
 ● 서버->클라이언트 : ArrayList<Posts>
@@ -51,20 +59,20 @@
 ● 서버->클라이언트 : ArrayList<Posts>
 
 ■ 포스트 쓰기(포스트 저장) (Post)
-● 클라이언트->서버 : (string) #post / 서버->클라이언트 : #ready
 ● 클라이언트->서버 : Posts
+서버->클라이언트   : #fin / #err
 
 ■ 내가 쓴 포스트 삭제 (delete)
 ● 클라이언트->서버 : (string) #delete$(int)index
-● 서버->클라이언트 : #fin
+● 서버->클라이언트 : #fin / #err
 
 ■ 포스트 좋아요 (like)
 ● 클라이언트->서버 : (string) #like$(int)index
-● 서버->클라이언트 : #fin
+● 서버->클라이언트 : #fin / #err
 
 ■ 포스트 좋아요 취소 (disLike)
 ● 클라이언트->서버 : (string) #dislike$(int)index
-● 서버->클라이언트 : #fin
+● 서버->클라이언트 : #fin / #err
 
 ■ 유저정보업데이트 (updateUser)
 ● 클라이언트->서버 : (string) #updateUser
