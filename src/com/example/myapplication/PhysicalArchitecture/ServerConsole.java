@@ -68,7 +68,11 @@ public class ServerConsole {
 		if (pass.compareTo(dbManager.getPWByID(id)) == 0){
 			user = dbManager.getUserByID(id);
 			System.out.println("Success!");
+<<<<<<< HEAD:src/com/example/myapplication/PhysicalArchitecture/ServerConsole.java
 			sendString("#fin");
+=======
+			sendUser(user);
+>>>>>>> 619d7eb1fd82982bb59d5c0395da8b1bf0fbe25c:src/PhysicalArchitecture/ServerConsole.java
 		}
 		else{
 			
@@ -98,11 +102,15 @@ public class ServerConsole {
 	public void refresh() {
 		try {
 			PostsList p = new PostsList(dbManager.refreshTimeLine());
+<<<<<<< HEAD:src/com/example/myapplication/PhysicalArchitecture/ServerConsole.java
 			
 			System.out.println("postsList size : " + p.size());
 			
 			System.out.println(p);
 		
+=======
+			System.out.println(p);
+>>>>>>> 619d7eb1fd82982bb59d5c0395da8b1bf0fbe25c:src/PhysicalArchitecture/ServerConsole.java
 			sendPostsList(p);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -156,6 +164,7 @@ public class ServerConsole {
 	}
 
 	public void post(Posts p) {
+<<<<<<< HEAD:src/com/example/myapplication/PhysicalArchitecture/ServerConsole.java
 		p.setPostsIndex(dbManager.getPostsIndex());
 		p.setPostsID(user.getUserIndex());
 		File image1 = new File("C:\\Users\\안준영\\Desktop\\DSC00565.jpg");
@@ -163,6 +172,12 @@ public class ServerConsole {
 		dbManager.insertPosts(p);
 		user.getMyList().add(p.getPostsIndex());
 		dbManager.updateUser(user);
+=======
+		p.setPostsIndex(dbManager.getPostsIndex());		
+		File image1 = new File("C:\\Users\\안준영\\Desktop\\DSC00565.jpg");
+		p.setFImage(image1);
+		dbManager.insertPosts(p);
+>>>>>>> 619d7eb1fd82982bb59d5c0395da8b1bf0fbe25c:src/PhysicalArchitecture/ServerConsole.java
 		
 		System.out.println(p);
 	}

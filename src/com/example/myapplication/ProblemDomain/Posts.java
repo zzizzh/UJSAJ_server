@@ -22,8 +22,12 @@ public class Posts implements Serializable{
 	long createTime;
 	File Fimage;
 	byte[] Iimage; 
+<<<<<<< HEAD:src/com/example/myapplication/ProblemDomain/Posts.java
 	static final long serialVersionUID = 300L;
 
+=======
+	
+>>>>>>> 619d7eb1fd82982bb59d5c0395da8b1bf0fbe25c:src/ProblemDomain/Posts.java
 	public Posts(){
 		this.index = 0;
 		this.locationInfo = new Location();

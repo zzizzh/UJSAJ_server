@@ -73,6 +73,7 @@ public class DBManager {
 	public ArrayList<Posts> refreshTimeLine() throws Exception {
 		ArrayList<Posts> P = new ArrayList<Posts>();
 		int dbIndex = (int) postsCollection.count();
+<<<<<<< HEAD:src/com/example/myapplication/DB/DBManager.java
 		
 		if (dbIndex > 0) {
 			if (dbIndex > 10) {
@@ -95,15 +96,63 @@ public class DBManager {
 		}
 		seeIndex = recentIndex;
 		
+=======
+		System.out.println(dbIndex);
+		int num = recentIndex;
+		System.out.println(num);
+		if (num < dbIndex) {
+		
+			if (dbIndex - num < 10) {
+				for (int i = 0; i < dbIndex - num; i++) {
+					
+					Posts posts = this.getPostsByIndex(recentIndex);
+					byte[] arr = this.getImageByIndex(recentIndex);
+					
+					if (arr != null) {
+						posts.setIImage(arr);	
+					}else{
+						posts.setIImage(null);
+					}
+					
+					// posts.setIImage(this.getImageByIndex(recentIndex));
+					P.add(posts);
+					recentIndex++;
+				}
+			} else {
+				for (int i = 0; i < 10; i++) {
+					
+					Posts posts = this.getPostsByIndex(recentIndex);
+					byte[] arr = this.getImageByIndex(recentIndex);
+					if (arr != null) {
+						posts.setIImage(arr);
+					} 
+					else{
+						posts.setIImage(null);
+					}
+					// posts.setIImage(this.getImageByIndex(recentIndex));
+					P.add(this.getPostsByIndex(recentIndex));
+					recentIndex++;
+				}
+			}
+		}
+
+>>>>>>> 619d7eb1fd82982bb59d5c0395da8b1bf0fbe25c:src/DB/DBManager.java
 		return P;
 	}
 
 	public ArrayList<Posts> getMorePosts() throws Exception {
 		ArrayList<Posts> p = new ArrayList<Posts>();
 
+		int k = seeIndex;
 		if (seeIndex < 10) {
+<<<<<<< HEAD:src/com/example/myapplication/DB/DBManager.java
 			for (; seeIndex > 0; seeIndex--) {
 
+=======
+			for (int i = 0; i < k; i++) {
+				
+				seeIndex--;
+>>>>>>> 619d7eb1fd82982bb59d5c0395da8b1bf0fbe25c:src/DB/DBManager.java
 				Posts posts = this.getPostsByIndex(seeIndex);
 				byte[] arr = this.getImageByIndex(seeIndex);
 				if (arr != null) {
@@ -111,13 +160,23 @@ public class DBManager {
 				} else {
 					posts.setIImage(null);
 				}
+<<<<<<< HEAD:src/com/example/myapplication/DB/DBManager.java
 
+=======
+			
+>>>>>>> 619d7eb1fd82982bb59d5c0395da8b1bf0fbe25c:src/DB/DBManager.java
 				// posts.setIImage(this.getImageByIndex(seeIndex));
 				p.add(posts);
 			}
 		} else {
+<<<<<<< HEAD:src/com/example/myapplication/DB/DBManager.java
 			for (; seeIndex > seeIndex - 10; seeIndex--) {
 
+=======
+			for (int i = 0; i < 10; i++) {
+				
+				seeIndex--;
+>>>>>>> 619d7eb1fd82982bb59d5c0395da8b1bf0fbe25c:src/DB/DBManager.java
 				Posts posts = this.getPostsByIndex(seeIndex);
 				byte[] arr = this.getImageByIndex(seeIndex);
 				if (arr != null) {
@@ -400,8 +459,12 @@ public class DBManager {
 						reader.setInput(iis);
 					}
 
+<<<<<<< HEAD:src/com/example/myapplication/DB/DBManager.java
 					Iimage = outputStream.toByteArray();
 					return Iimage;
+=======
+					return outputStream.toByteArray();
+>>>>>>> 619d7eb1fd82982bb59d5c0395da8b1bf0fbe25c:src/DB/DBManager.java
 
 				} catch (IOException e) {
 					throw new Exception("Cannot retrieve content of gridFsFile [" + index + "]", e);
@@ -540,10 +603,17 @@ public class DBManager {
 				int index = (int) ccursor.next().get("index");
 				i.add(index);
 			}
+<<<<<<< HEAD:src/com/example/myapplication/DB/DBManager.java
 		} else {
 			return p;
 		}
 
+=======
+		} else{
+			return p;
+		}
+		
+>>>>>>> 619d7eb1fd82982bb59d5c0395da8b1bf0fbe25c:src/DB/DBManager.java
 		for (int j = 0; j < i.size(); j++) {
 			Posts posts = this.getPostsByIndex(i.get(j));
 			p.add(posts);

@@ -1,10 +1,19 @@
+<<<<<<< HEAD:src/com/example/myapplication/test/test.java
 package com.example.myapplication.test;
+=======
+package test;
+>>>>>>> 619d7eb1fd82982bb59d5c0395da8b1bf0fbe25c:src/test/test.java
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.Scanner;
 
+<<<<<<< HEAD:src/com/example/myapplication/test/test.java
 import com.example.myapplication.DB.DBManager;
 import com.example.myapplication.ProblemDomain.Posts;
+=======
+import DB.DBManager;
+import ProblemDomain.Posts;
+>>>>>>> 619d7eb1fd82982bb59d5c0395da8b1bf0fbe25c:src/test/test.java
 public class test {
 
 	public static void main(String[] args) throws Exception {
