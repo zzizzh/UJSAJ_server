@@ -1,9 +1,5 @@
 package com.example.myapplication.Foundation;
 
-<<<<<<< HEAD:src/com/example/myapplication/Foundation/PostsList.java
-
-=======
->>>>>>> 619d7eb1fd82982bb59d5c0395da8b1bf0fbe25c:src/Foundation/PostsList.java
 import java.io.Serializable;
 import java.util.ArrayList;
 
@@ -40,12 +36,6 @@ public class PostsList implements Serializable{
 	public void deletePosts(int i) {
 		if (postsList.size() > 0)
 			postsList.remove(i);
-<<<<<<< HEAD:src/com/example/myapplication/Foundation/PostsList.java
-
-=======
-		else
-			System.out.println("������ �Ұ��� �մϴ�.");
->>>>>>> 619d7eb1fd82982bb59d5c0395da8b1bf0fbe25c:src/Foundation/PostsList.java
 	}
 
 	@Override

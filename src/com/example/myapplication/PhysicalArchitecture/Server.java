@@ -1,6 +1,5 @@
 package com.example.myapplication.PhysicalArchitecture;
 
-import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.InetAddress;
@@ -8,7 +7,6 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 
-import com.example.myapplication.DB.DBManager;
 import com.example.myapplication.ProblemDomain.Posts;
 
 public class Server extends Thread// ����������Ŭ����
