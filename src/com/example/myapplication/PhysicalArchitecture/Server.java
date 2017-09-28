@@ -96,12 +96,12 @@ class EchoThread extends Thread {
 				if(temp instanceof String)
 				{
 					line = (String) temp;
-					System.out.println("-----send String message to server : " + line);
+					System.out.println("-----received String message to server : " + line);
 					serverConsole.handleMeg(line);
 				}
 				else if(temp instanceof Posts)
 				{
-					System.out.println("-----send Posts to server : " + temp.toString());
+					System.out.println("-----received Posts to server : " + temp.toString());
 					serverConsole.post((Posts)temp);
 				}
 				

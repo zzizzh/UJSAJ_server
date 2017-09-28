@@ -4,38 +4,39 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 public class Location implements Serializable{
-	int bigLocation;
-	int midLocation;
-	int smallLocation;
-	static final long serialVersionUID = 200L;
+	private String bigLocation;
+	private String midLocation;
+	private String smallLocation;
+	private static final long serialVersionUID = 200L;
 
-	int contentID;
-	int contentTypeID;
-	String title;
+	private int contentID;
+	private int contentTypeID;
+	private String title;
+	
 	public Location(){
-		bigLocation = 0;
-		midLocation = 0;
-		smallLocation = 0;
+		bigLocation = null;
+		midLocation = null;
+		smallLocation = null;
 		contentID = 0;
 		contentTypeID = 0;
 		title = null;
 	}
-	public int getBigLocation() {
+	public String getBigLocation() {
 		return bigLocation;
 	}
-	public void setBigLocation(int bigLocation) {
+	public void setBigLocation(String bigLocation) {
 		this.bigLocation = bigLocation;
 	}
-	public int getMidLocation() {
+	public String getMidLocation() {
 		return midLocation;
 	}
-	public void setMidLocation(int midLocation) {
+	public void setMidLocation(String midLocation) {
 		this.midLocation = midLocation;
 	}
-	public int getSmallLocation() {
+	public String getSmallLocation() {
 		return bigLocation;
 	}	
-	public void setSmallLocation(int smallLocation) {
+	public void setSmallLocation(String smallLocation) {
 		this.smallLocation = smallLocation;
 	}
 

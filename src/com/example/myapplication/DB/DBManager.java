@@ -5,7 +5,9 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -13,6 +15,7 @@ import java.util.Iterator;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
+import javax.imageio.stream.ImageOutputStream;
 
 import com.example.myapplication.ProblemDomain.Location;
 import com.example.myapplication.ProblemDomain.Posts;
@@ -71,67 +74,74 @@ public class DBManager {
 
 	public ArrayList<Posts> refreshTimeLine() throws Exception {
 		ArrayList<Posts> P = new ArrayList<Posts>();
-		int dbIndex = (int) postsCollection.count();
-		
-		if (dbIndex > 0) {
-			if (dbIndex > 10) {
-				for (int i = 0; i < 10; i++) {
-					Posts posts = this.getPostsByIndex(recentIndex);
-					System.out.println("recentIndex : " + recentIndex + " " + posts.toString());
-					byte[] arr = this.getImageByIndex(recentIndex);
-					
-					if (arr != null) {
-						posts.setIImage(arr);	
-					}else{
-						posts.setIImage(null);
+		recentIndex = (int) postsCollection.count() - 1;
+		int dbIndex = recentIndex;
+
+		if (dbIndex >= 0) {
+			if (dbIndex >= 7) {
+				for (int i = 0; i < 7; i++) {
+					Posts posts = getPostsByIndex(recentIndex);
+					try {
+						File file = new File("C:\\Users\\안준영\\Desktop\\DB사진\\" + posts.getPostsIndex() + ".png");
+						InputStream is = new FileInputStream(file);
+						long length = file.length();
+
+						byte[] bytes = new byte[(int) length];
+						int offset = 0;
+						int numRead = 0;
+						while (offset < bytes.length
+								&& (numRead = is.read(bytes, offset, bytes.length - offset)) >= 0) {
+							offset += numRead;
+						}
+						posts.setIImage(bytes);
+						if (offset < bytes.length) {
+							throw new IOException("Could not completely read file " + file.getName());
+						}
+						is.close();
+
+					} catch (Exception e) {
+						e.printStackTrace();
 					}
-					
+
 					// posts.setIImage(this.getImageByIndex(recentIndex));
 					P.add(posts);
 					recentIndex--;
 				}
 			}
-		}
-		seeIndex = recentIndex;
-		
-		System.out.println(dbIndex);
-		int num = recentIndex;
-		System.out.println(num);
-		if (num < dbIndex) {
-		
-			if (dbIndex - num < 10) {
-				for (int i = 0; i < dbIndex - num; i++) {
-					
-					Posts posts = this.getPostsByIndex(recentIndex);
-					byte[] arr = this.getImageByIndex(recentIndex);
-					
-					if (arr != null) {
-						posts.setIImage(arr);	
-					}else{
-						posts.setIImage(null);
+			else{
+				for(int i=0;i<=dbIndex;i++){
+					Posts posts = getPostsByIndex(recentIndex);
+					try {
+						File file = new File("C:\\Users\\안준영\\Desktop\\DB사진\\" + posts.getPostsIndex() + ".png");
+						InputStream is = new FileInputStream(file);
+						long length = file.length();
+
+						byte[] bytes = new byte[(int) length];
+						int offset = 0;
+						int numRead = 0;
+						while (offset < bytes.length
+								&& (numRead = is.read(bytes, offset, bytes.length - offset)) >= 0) {
+							offset += numRead;
+						}
+						posts.setIImage(bytes);
+						if (offset < bytes.length) {
+							throw new IOException("Could not completely read file " + file.getName());
+						}
+						is.close();
+
+					} catch (Exception e) {
+						e.printStackTrace();
 					}
-					
+
 					// posts.setIImage(this.getImageByIndex(recentIndex));
 					P.add(posts);
-					recentIndex++;
-				}
-			} else {
-				for (int i = 0; i < 10; i++) {
-					
-					Posts posts = this.getPostsByIndex(recentIndex);
-					byte[] arr = this.getImageByIndex(recentIndex);
-					if (arr != null) {
-						posts.setIImage(arr);
-					} 
-					else{
-						posts.setIImage(null);
-					}
-					// posts.setIImage(this.getImageByIndex(recentIndex));
-					P.add(this.getPostsByIndex(recentIndex));
-					recentIndex++;
+					recentIndex--;
 				}
 			}
+			
 		}
+		seeIndex = recentIndex;
+
 		return P;
 	}
 
@@ -139,8 +149,8 @@ public class DBManager {
 		ArrayList<Posts> p = new ArrayList<Posts>();
 
 		int k = seeIndex;
-		if (seeIndex < 10) {
-			for (; seeIndex > 0; seeIndex--) {
+		if (seeIndex < 7) {
+			for (; seeIndex >= 0; seeIndex--) {
 
 				Posts posts = this.getPostsByIndex(seeIndex);
 				byte[] arr = this.getImageByIndex(seeIndex);
@@ -153,7 +163,7 @@ public class DBManager {
 				p.add(posts);
 			}
 		} else {
-			for (; seeIndex > seeIndex - 10; seeIndex--) {
+			for (; seeIndex > seeIndex - 5; seeIndex--) {
 
 				Posts posts = this.getPostsByIndex(seeIndex);
 				byte[] arr = this.getImageByIndex(seeIndex);
@@ -256,14 +266,13 @@ public class DBManager {
 
 	//
 	public User getUserByID(String id) {
-
 		User user = new User();
 
 		BasicDBObject idQuery = new BasicDBObject();
 		idQuery.put("ID", id);
-
+		
 		DBCursor cursorId = userCollection.find(idQuery);
-
+		
 		if (cursorId.hasNext()) {
 			DBObject check = null;
 			check = cursorId.next();
@@ -356,8 +365,7 @@ public class DBManager {
 
 	// index
 	public Posts getPostsByIndex(int index) {
-
-		Posts posts = new Posts();
+		Posts posts = null;
 
 		BasicDBObject idQuery = new BasicDBObject();
 		idQuery.put("index", index);
@@ -365,6 +373,7 @@ public class DBManager {
 		DBCursor cursorId = postsCollection.find(idQuery);
 
 		if (cursorId.hasNext()) {
+			posts = new Posts();
 			DBObject check = null;
 			check = cursorId.next();
 			if (check != null) {
@@ -373,15 +382,34 @@ public class DBManager {
 				Location location = new Location();
 				BasicDBObject locQuery = new BasicDBObject();
 				locQuery.put("index", index);
+				try {
+					File file = new File("C:\\Users\\안준영\\Desktop\\DB사진\\" + posts.getPostsIndex() + ".png");
+					InputStream is = new FileInputStream(file);
+					long length = file.length();
 
+					byte[] bytes = new byte[(int) length];
+					int offset = 0;
+					int numRead = 0;
+					while (offset < bytes.length && (numRead = is.read(bytes, offset, bytes.length - offset)) >= 0) {
+						offset += numRead;
+					}
+					posts.setIImage(bytes);
+					if (offset < bytes.length) {
+						throw new IOException("Could not completely read file " + file.getName());
+					}
+					is.close();
+
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 				DBCursor cursorLoc = locationCollection.find(locQuery);
 				if (cursorLoc.hasNext()) {
 					DBObject checkLoc = null;
 					checkLoc = cursorLoc.next();
 					if (checkLoc != null) {
-						location.setBigLocation((int) checkLoc.get("BigLocation"));
-						location.setMidLocation((int) checkLoc.get("MidLocation"));
-						location.setSmallLocation((int) checkLoc.get("SmallLocation"));
+						location.setBigLocation((String) checkLoc.get("BigLocation"));
+						location.setMidLocation((String) checkLoc.get("MidLocation"));
+						location.setSmallLocation((String) checkLoc.get("SmallLocation"));
 						location.setContentID((int) checkLoc.get("ContentID"));
 						location.setContentTypeID((int) checkLoc.get("ContentTypeID"));
 						location.setTitle((String) checkLoc.get("Title"));
@@ -529,7 +557,7 @@ public class DBManager {
 		return p;
 	}
 
-	public ArrayList<Posts> getPostsByOption(int option, int value) {
+	public ArrayList<Posts> getPostsByOption(int option, String value) {
 		ArrayList<Integer> i = new ArrayList<Integer>();
 		ArrayList<Posts> p = new ArrayList<Posts>();
 
@@ -569,7 +597,7 @@ public class DBManager {
 		} else if (option == 3) {
 			BasicDBObject cquery = new BasicDBObject();
 
-			cquery.put("ContentID", value);
+			cquery.put("ContentID", Integer.parseInt(value));
 
 			DBCursor ccursor = locationCollection.find(cquery);
 
