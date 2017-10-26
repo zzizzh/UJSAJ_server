@@ -19,6 +19,7 @@ import javax.imageio.stream.ImageOutputStream;
 
 import com.example.myapplication.ProblemDomain.Location;
 import com.example.myapplication.ProblemDomain.Posts;
+import com.example.myapplication.ProblemDomain.Music;
 import com.example.myapplication.ProblemDomain.User;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
@@ -48,20 +49,25 @@ public class DBManager {
 	public DBCollection userCollection = db.getCollection("User");
 	DBCollection postsCollection = db.getCollection("Posts");
 	DBCollection locationCollection = db.getCollection("Location");
-
+	DBCollection songCollection = db.getCollection("Song");
+	
 	public DBManager() {
 
 		DBCursor userCursor = userCollection.find();
 		DBCursor postsCursor = postsCollection.find();
-
+		
+		userCollection.createIndex("ID");
+		songCollection.createIndex("songID");
+		postsCollection.createIndex("index");
 		// count all users in DB
-		userIndex = (int) userCollection.count();
+		userIndex = (int) userCollection.count() ;
 
 		// count all posts in DB
-		postsIndex = (int) postsCollection.count();
+		postsIndex = (int) postsCollection.count() ;
 
-		recentIndex = (int) postsCollection.count();
-		seeIndex = (int) postsCollection.count();
+		recentIndex = (int) postsCollection.count() ;
+		seeIndex = (int) postsCollection.count() - 1;
+		
 	}
 
 	public int getUserIndex() {
@@ -81,6 +87,7 @@ public class DBManager {
 			if (dbIndex >= 7) {
 				for (int i = 0; i < 7; i++) {
 					Posts posts = getPostsByIndex(recentIndex);
+					/*
 					try {
 						File file = new File("C:\\Users\\안준영\\Desktop\\DB사진\\" + posts.getPostsIndex() + ".png");
 						InputStream is = new FileInputStream(file);
@@ -102,8 +109,10 @@ public class DBManager {
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
-
+					
 					// posts.setIImage(this.getImageByIndex(recentIndex));
+					 * 
+					 */
 					P.add(posts);
 					recentIndex--;
 				}
@@ -111,8 +120,10 @@ public class DBManager {
 			else{
 				for(int i=0;i<=dbIndex;i++){
 					Posts posts = getPostsByIndex(recentIndex);
-					try {
-						File file = new File("C:\\Users\\안준영\\Desktop\\DB사진\\" + posts.getPostsIndex() + ".png");
+					/*
+					File file = new File("C:\\Users\\안준영\\Desktop\\DB사진\\" + posts.getPostsIndex() + ".png");
+					if(file != null){
+						
 						InputStream is = new FileInputStream(file);
 						long length = file.length();
 
@@ -128,12 +139,10 @@ public class DBManager {
 							throw new IOException("Could not completely read file " + file.getName());
 						}
 						is.close();
-
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-
-					// posts.setIImage(this.getImageByIndex(recentIndex));
+					} 
+					
+					posts.setIImage(this.getImageByIndex(recentIndex));
+					*/
 					P.add(posts);
 					recentIndex--;
 				}
@@ -145,6 +154,8 @@ public class DBManager {
 		return P;
 	}
 
+	
+	
 	public ArrayList<Posts> getMorePosts() throws Exception {
 		ArrayList<Posts> p = new ArrayList<Posts>();
 
@@ -200,8 +211,37 @@ public class DBManager {
 		userCollection.insert(document);
 
 	}
+	public void insertUserImage(User user,File Fimage){
+		if (user.getFImage() != null) {
+			try {
 
-	public User getUserByIndex(int index) {
+				String newFileName = Integer.toString(user.getUserIndex());
+
+				File imageFile = Fimage;
+
+				// create a "photo" namespace
+				GridFS gfsPhoto = new GridFS(db, "UserImage");
+
+				// get image file from local drive
+				GridFSInputFile gfsFile = gfsPhoto.createFile(imageFile);
+
+				// set a new filename for identify purpose
+				gfsFile.setFilename(newFileName);
+
+				// save the image file into mongoDB
+				gfsFile.save();
+
+			} catch (UnknownHostException e) {
+				e.printStackTrace();
+			} catch (MongoException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+
+	}
+	public User getUserByIndex(int index) throws Exception {
 		User user = new User();
 
 		BasicDBObject idQuery = new BasicDBObject();
@@ -216,14 +256,108 @@ public class DBManager {
 				user.setUserIndex((Integer) check.get("index"));
 				user.setUserId((String) check.get("ID"));
 				user.setUserPw((String) check.get("PW"));
-				user.setUserLikeList((ArrayList<Integer>) check.get("LikeList"));
-				user.setUserMyList((ArrayList<Integer>) check.get("MyList"));
+				
+				ArrayList<Integer> arrL1 = new ArrayList<Integer>();
+				ArrayList<Integer> arrL2 = new ArrayList<Integer>();
+				
+				arrL1 = (ArrayList<Integer>)(check.get("LikeList"));
+				
+				for(int i=0; i<arrL1.size();i++){
+					arrL2.add(arrL1.get(i));
+				}
+		
+			
+				user.setUserLikeList(arrL2);
+			
+				
+				ArrayList<Integer> arrM1 = new ArrayList<Integer>();
+				ArrayList<Integer> arrM2 = new ArrayList<Integer>();
+				arrM1 = (ArrayList<Integer>)(check.get("MyList"));
+				
+				for(int i=0;i<arrM1.size();i++){
+					arrM2.add(arrM1.get(i));
+				}
+				user.setUserMyList(arrM2);
 
+				user.setIImage(this.getUserImageByIndex(user.getUserIndex()));
+				/*
+				BasicDBObject locQuery = new BasicDBObject();
+				locQuery.put("index", index);
+				try { // 내컴퓨터에서 받는거
+					File file = new File("C:\\Users\\안준영\\Desktop\\DB사진\\프로필사진\\" + user.getUserIndex() + ".png");
+					InputStream is = new FileInputStream(file);
+					long length = file.length();
+
+					byte[] bytes = new byte[(int) length];
+					int offset = 0;
+					int numRead = 0;
+					while (offset < bytes.length && (numRead = is.read(bytes, offset, bytes.length - offset)) >= 0) {
+						offset += numRead;
+					}
+					user.setIImage(bytes);
+					if (offset < bytes.length) {
+						throw new IOException("Could not completely read file " + file.getName());
+					}
+					is.close();
+
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				*/
 				return user;
+			}
+			
+		}
+		return null;
+	}	// index
+	public byte[] getUserImageByIndex(int index) throws Exception { // 디비에서 받는거
+
+		User user = new User();
+		byte[] Iimage;
+		GridFS gfsPhoto = new GridFS(db, "UserImage");
+
+		BasicDBObject idQuery = new BasicDBObject();
+		idQuery.put("index", index);
+
+		DBCursor cursorId = userCollection.find(idQuery);
+
+		while (cursorId.hasNext()) {
+			DBObject check = null;
+			check = cursorId.next();
+			if (check != null) {
+
+				try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+
+					GridFSDBFile imageForOutput = gfsPhoto.findOne(Integer.toString(index));
+					if (imageForOutput == null) {
+						System.out.println("imageForOutput : null");
+						return null;
+					}
+					imageForOutput.writeTo(outputStream);
+
+					BufferedImage bimage;
+					Image newImage;
+
+					ImageInputStream iis = ImageIO
+							.createImageInputStream(new ByteArrayInputStream(outputStream.toByteArray()));
+					Iterator<ImageReader> iter = ImageIO.getImageReaders(iis);
+					if (iter.hasNext()) {
+						ImageReader reader = (ImageReader) iter.next();
+						reader.setInput(iis);
+					}
+
+					Iimage = outputStream.toByteArray();
+					return Iimage;
+
+				} catch (IOException e) {
+					throw new Exception("Cannot retrieve content of gridFsFile [" + index + "]", e);
+				}
+
 			}
 		}
 		return null;
 	}
+
 
 	public void updateUser(User user) {
 
@@ -265,7 +399,8 @@ public class DBManager {
 	}
 
 	//
-	public User getUserByID(String id) {
+
+	public User getUserByID(String id) throws Exception {
 		User user = new User();
 
 		BasicDBObject idQuery = new BasicDBObject();
@@ -277,11 +412,32 @@ public class DBManager {
 			DBObject check = null;
 			check = cursorId.next();
 			if (check != null) {
-				user.setUserIndex((Integer) check.get("index"));
+				int n = (int) check.get("index");
+				user.setUserIndex(n);
 				user.setUserId((String) check.get("ID"));
 				user.setUserPw((String) check.get("PW"));
-				user.setUserLikeList((ArrayList<Integer>) check.get("LikeList"));
-				user.setUserMyList((ArrayList<Integer>) check.get("MyList"));
+				ArrayList<Integer> arrL1 = new ArrayList<Integer>();
+				ArrayList<Integer> arrL2 = new ArrayList<Integer>();
+				
+				arrL1 = (ArrayList<Integer>)(check.get("LikeList"));
+				
+				for(int i=0; i<arrL1.size();i++){
+					arrL2.add(arrL1.get(i));
+				}
+		
+			
+				user.setUserLikeList(arrL2);
+			
+				
+				ArrayList<Integer> arrM1 = new ArrayList<Integer>();
+				ArrayList<Integer> arrM2 = new ArrayList<Integer>();
+				arrM1 = (ArrayList<Integer>)(check.get("MyList"));
+				
+				for(int i=0;i<arrM1.size();i++){
+					arrM2.add(arrM1.get(i));
+				}
+				user.setUserMyList(arrM2);
+				user.setIImage(getUserImageByIndex(n)); 
 				return user;
 			}
 		}
@@ -292,14 +448,13 @@ public class DBManager {
 	public void insertPosts(Posts posts) {
 
 		BasicDBObject document = new BasicDBObject();
-		document.put("index", postsIndex);
+		document.put("postsID", postsIndex);
 		this.insertLocation(posts.getLocationInfo());
 		postsIndex++;
-		document.put("URL", posts.getUrl());
-		document.put("Artist", posts.getArtist());
-		document.put("Song", posts.getSong());
+		document.put("songID", posts.getMusic().getMusicId());
+		this.insertSong(posts.getMusic());
 		document.put("Comment", posts.getComment());
-		document.put("PostsID", posts.getPostsID());
+		document.put("userID", posts.getUserID());
 		document.put("Like", posts.getLike());
 		document.put("CreateTime", posts.getCreateTime());
 
@@ -338,17 +493,54 @@ public class DBManager {
 
 	}
 
+	public void insertSong(Music song) {
+
+		BasicDBObject songQuery = new BasicDBObject();
+		songQuery.put("songID", song.getMusicId());
+		DBCursor cursorSong = songCollection.find(songQuery);
+		if (cursorSong.hasNext()) {
+			return;
+		}
+		
+		BasicDBObject document = new BasicDBObject();
+		document.put("songID", song.getMusicId());
+		document.put("SongName", song.getMusicName());
+		document.put("albumID", song.getAlbumId());
+		document.put("AlbumName", song.getAlbumName());
+		document.put("ArtistID", song.getArtistId());
+		document.put("ArtistName", song.getArtistName());
+		document.put("MenuID", song.getMenuId());
+		
+		songCollection.insert(document);
+
+	}
+	
+	public void updateSong(Music song) {
+
+		BasicDBObject updateQuery = new BasicDBObject();
+
+		updateQuery.put("songID", song.getMusicId());
+		updateQuery.put("SongName", song.getMusicName());
+		updateQuery.put("albumID", song.getAlbumId());
+		updateQuery.put("AlbumName", song.getAlbumName());
+		updateQuery.put("ArtistID",song.getArtistId());
+		updateQuery.put("ArtistName",  song.getArtistName());
+		updateQuery.put("MenuID", song.getMenuId());
+		BasicDBObject searchQuery = new BasicDBObject().append("index", song.getMusicId());
+		songCollection.update(searchQuery, updateQuery);
+
+	}
+	
 	//
 	public void updatePostsList(Posts posts) {
 
 		BasicDBObject updateQuery = new BasicDBObject();
 
-		updateQuery.put("index", posts.getPostsIndex());
-		updateQuery.put("URL", posts.getUrl());
-		updateQuery.put("Artist", posts.getArtist());
-		updateQuery.put("Song", posts.getSong());
+		updateQuery.put("postsID", posts.getPostsIndex());
+		
+		this.updateSong(posts.getMusic());
 		updateQuery.put("Comment", posts.getComment());
-		updateQuery.put("PostsID", posts.getPostsID());
+		updateQuery.put("userID", posts.getUserID());
 		updateQuery.put("Like", posts.getLike());
 		updateQuery.put("CreateTime", posts.getCreateTime());
 
@@ -359,16 +551,16 @@ public class DBManager {
 
 	public void deletePosts(int index) {
 		DBObject document = new BasicDBObject();
-		document.put("index", index);
+		document.put("postsID", index);
 		postsCollection.remove(document);
 	}
 
 	// index
-	public Posts getPostsByIndex(int index) {
+	public Posts getPostsByIndex(int index) throws Exception {
 		Posts posts = null;
 
 		BasicDBObject idQuery = new BasicDBObject();
-		idQuery.put("index", index);
+		idQuery.put("postsID", index);
 
 		DBCursor cursorId = postsCollection.find(idQuery);
 
@@ -377,11 +569,9 @@ public class DBManager {
 			DBObject check = null;
 			check = cursorId.next();
 			if (check != null) {
-				posts.setPostsIndex((Integer) check.get("index"));
-
-				Location location = new Location();
-				BasicDBObject locQuery = new BasicDBObject();
-				locQuery.put("index", index);
+				posts.setPostsIndex((int) check.get("postsID"));
+				posts.setIImage(this.getImageByIndex(index));
+				/*
 				try {
 					File file = new File("C:\\Users\\안준영\\Desktop\\DB사진\\" + posts.getPostsIndex() + ".png");
 					InputStream is = new FileInputStream(file);
@@ -402,6 +592,10 @@ public class DBManager {
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
+				*/
+				Location location = new Location();
+				BasicDBObject locQuery = new BasicDBObject();
+				locQuery.put("index", index);
 				DBCursor cursorLoc = locationCollection.find(locQuery);
 				if (cursorLoc.hasNext()) {
 					DBObject checkLoc = null;
@@ -417,13 +611,33 @@ public class DBManager {
 					}
 				}
 				posts.setLocationInfo(location);
-				posts.setUrl((String) check.get("URL"));
-				posts.setArtist((String) check.get("Artist"));
-				posts.setSong((String) check.get("Song"));
+				
+				posts.setMusicID((int) check.get("songID"));
+				
+				Music song = new Music();
+				BasicDBObject songQuery = new BasicDBObject();
+				songQuery.put("songID", posts.getMusicID());
+				DBCursor cursorSong = songCollection.find(songQuery);
+				if (cursorSong.hasNext()) {
+					DBObject checkSong = null;
+					checkSong = cursorSong.next();
+					if (checkSong != null) {
+						song.setMusicId((int) checkSong.get("songID"));
+						song.setMusicName((String) checkSong.get("SongName"));
+						song.setAlbumId((int) checkSong.get("albumID"));
+						song.setAlbumName((String) checkSong.get("AlbumName"));
+						song.setArtistId((int) checkSong.get("ArtistID"));
+						song.setArtistName((String) checkSong.get("ArtistName"));
+						song.setMenuId((int) checkSong.get("MenuID"));
+					}
+				}
+				
+				posts.setMusic(song);
+				
 				posts.setComment((String) check.get("Comment"));
-				posts.setPostsID((int) check.get("PostsID"));
+				posts.setUserID((int) check.get("userID"));
 				posts.setLike((int) check.get("Like"));
-				posts.setCreateTime((long) check.get("CreateTime"));
+				posts.setCreateTime((String) check.get("CreateTime"));
 			}
 		}
 		return posts;
@@ -497,7 +711,7 @@ public class DBManager {
 
 	}
 
-	public ArrayList<Posts> getPostsByLocation(Location location) {
+	public ArrayList<Posts> getPostsByLocation(Location location) throws Exception {
 
 		ArrayList<Integer> i = new ArrayList<Integer>();
 		ArrayList<Posts> p = new ArrayList<Posts>();
@@ -557,7 +771,7 @@ public class DBManager {
 		return p;
 	}
 
-	public ArrayList<Posts> getPostsByOption(int option, String value) {
+	public ArrayList<Posts> getPostsByOption(int option, String value) throws Exception {
 		ArrayList<Integer> i = new ArrayList<Integer>();
 		ArrayList<Posts> p = new ArrayList<Posts>();
 

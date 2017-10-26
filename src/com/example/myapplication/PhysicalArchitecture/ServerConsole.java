@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 import javax.imageio.ImageIO;
 
@@ -21,7 +22,7 @@ public class ServerConsole {
 
 	private int likeCnt = 0;
 	private int myCnt = 0;
-	private User user;
+	private User user = new User();
 
 	public ServerConsole(ObjectOutputStream objout) {
 		dbManager = new DBManager();
@@ -31,14 +32,18 @@ public class ServerConsole {
 	/*
 	 * 클라이언트에서 받은 명령어를 처리하는 함수 명령어는 #으로 시작하고 $로 토큰을 구분한다.
 	 */
-	public void handleMeg(String msg) {
+	public void handleMeg(String msg) throws Exception {
 		System.out.println("클라이언트로부터 받은 문자열 : " + msg);
 
 		if (msg.startsWith("#register")) {
 			register(msg);
 		} else if (msg.startsWith("#login")) {
 			login(msg);
-		} else if (msg.startsWith("#morePosts")) {
+		}
+		else if(msg.startsWith("#findPass")){
+			findPass(msg);
+		}
+		else if (msg.startsWith("#morePosts")) {
 			morePosts();
 		} else if (msg.startsWith("#refresh")) {
 			refresh();
@@ -64,40 +69,54 @@ public class ServerConsole {
 	}
 
 	// ----------------function------------//
-
-	private void login(String msg) {
+	 public String formatTime(long lTime) {
+	        Calendar c = Calendar.getInstance();
+	        c.setTimeInMillis(lTime);
+	        return (c.get(Calendar.HOUR_OF_DAY) + "시 " + c.get(Calendar.MINUTE) + "분 " + c.get(Calendar.SECOND) + "." + c.get(Calendar.MILLISECOND) + "초");
+	    } 
+	private void login(String msg) throws Exception {
 		msg = msg.substring(7);
 		String[] token = msg.split("%");
 		String id = token[0];
 		String pass = token[1];
-
+	    // 시작 시간
+        long startTime = System.currentTimeMillis();
+        // 실행 시간 체크될 녀석들...
+    /*
+        User U = new User();
+        sendUser(U);
+  */
 		User k = dbManager.getUserByID(id);
-
+		System.out.println(k);
+		 // 종료 시간
+        long endTime = System.currentTimeMillis();
+        // 시간 출력
+        System.out.println("##  시작시간 : " + formatTime(startTime));
+        System.out.println("##  종료시간 : " + formatTime(endTime));
+        System.out.println("##  소요시간(초.0f) : " + ( endTime - startTime )/1000.0f +"초");
 		if (dbManager == null) {
 			System.out.println("dbManaer = null");
 		}
 
-		if (k == null) {// id가 없으면 회원가임
-
-			System.out.println("중간지점");
+		else if (k == null) {// id가 없으면 회원가임
 
 			this.register(id, pass);
 			System.out.println("회원가입완료");
-			//sendUser(user);
+			sendUser(user);
 		}
 		
 		else if (pass.compareTo(dbManager.getPWByID(id)) == 0) {//로그인성공
-			user = dbManager.getUserByID(id);
-			sendUser(user);
+			user = k;
+			sendUser(k);
 		}
-
-		
 
 		else {// 비밀번호가틀리면
 			System.out.println("비밀번호 틀림");
 			// System.out.println("Success!");
 			sendString("#err");
 		}
+		
+
 	}
 
 	private void register(String msg) {
@@ -113,7 +132,6 @@ public class ServerConsole {
 			User user = new User(dbManager.getUserIndex(), id, pass);
 
 			dbManager.insertUser(user);
-
 			sendUser(user);
 		}
 	}
@@ -130,7 +148,21 @@ public class ServerConsole {
 			
 		}
 	}
-
+	public void findPass(String msg) throws Exception{
+		msg = msg.substring(10);
+		String[] token = msg.split("%");
+		String id = token[0];
+		
+		User user = dbManager.getUserByID(id);
+		if(user == null){
+			sendString("#err");
+		}
+		else{
+			MailManager m = new MailManager(user);
+			sendString("#fin");
+		}
+				
+	}
 	public void refresh() {
 		try {
 			PostsList p = new PostsList(dbManager.refreshTimeLine());
@@ -155,7 +187,7 @@ public class ServerConsole {
 		}
 	}
 
-	public void myPosts() {
+	public void myPosts() throws Exception {
 		myCnt = 0;
 
 		System.out.println("==============in myPosts===============");
@@ -169,7 +201,7 @@ public class ServerConsole {
 		for (int i = 0; i < temp.size(); i++) {
 			if (i == 5)
 				break;
-			Posts posts = dbManager.getPostsByIndex(temp.get(i));
+			Posts posts = dbManager.getPostsByIndex((int)(temp.get(i)));
 			System.out.println(posts.toString());
 
 			p.addPosts(posts);
@@ -180,7 +212,7 @@ public class ServerConsole {
 		sendPostsList(p);
 	}
 
-	public void moreMyPosts() {
+	public void moreMyPosts() throws Exception {
 		ArrayList<Integer> temp = user.getMyList();
 
 		PostsList p = new PostsList();
@@ -189,14 +221,14 @@ public class ServerConsole {
 			if (i == likeCnt + 10)
 				break;
 
-			p.addPosts(dbManager.getPostsByIndex(temp.get(i)));
+			p.addPosts(dbManager.getPostsByIndex((int)(temp.get(i))));
 			myCnt++;
 		}
 		System.out.println(p);
 		sendPostsList(p);
 	}
 
-	public void myLike() {
+	public void myLike() throws Exception {
 		likeCnt = 0;
 
 		ArrayList<Integer> temp = user.getLikeList();
@@ -207,14 +239,14 @@ public class ServerConsole {
 			if (i == 5)
 				break;
 
-			p.addPosts(dbManager.getPostsByIndex(temp.get(i)));
+			p.addPosts(dbManager.getPostsByIndex((int)(temp.get(i))));
 			likeCnt++;
 		}
 		System.out.println(p);
 		sendPostsList(p);
 	}
 
-	public void moreLike() {
+	public void moreLike() throws Exception {
 		ArrayList<Integer> temp = user.getLikeList();
 
 		PostsList p = new PostsList();
@@ -223,26 +255,38 @@ public class ServerConsole {
 			if (i == likeCnt + 10)
 				break;
 
-			p.addPosts(dbManager.getPostsByIndex(temp.get(i)));
+			p.addPosts(dbManager.getPostsByIndex((int)(temp.get(i))));
 			likeCnt++;
 		}
 		System.out.println(p);
 		sendPostsList(p);
 	}
-
-	public void post(Posts p) {
-		p.setPostsIndex(dbManager.getPostsIndex());
-		p.setPostsID(user.getUserIndex());
+	public void insertUserImage(User user){
+		
 		File fImage;
 		try {
+			ByteArrayInputStream inputStream = new ByteArrayInputStream(user.getIImage());
+			BufferedImage bufferedImage = ImageIO.read(inputStream);
+
+			ImageIO.write(bufferedImage, "png",
+					(fImage = new File("C:\\Users\\안준영\\Desktop\\DB사진\\프로필사진\\" + user.getUserIndex() + ".png")));
+			user.setFImage(fImage);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void post(Posts p) throws IOException {
+		p.setPostsIndex(dbManager.getPostsIndex());
+		p.setUserID(user.getUserIndex());
+		File fImage;
+		if(p.getIImage() != null){
 			ByteArrayInputStream inputStream = new ByteArrayInputStream(p.getIImage());
 			BufferedImage bufferedImage = ImageIO.read(inputStream);
 
 			ImageIO.write(bufferedImage, "png",
 					(fImage = new File("C:\\Users\\안준영\\Desktop\\DB사진\\" + p.getPostsIndex() + ".png")));
 			p.setFImage(fImage);
-		} catch (Exception e) {
-			e.printStackTrace();
 		}
 		dbManager.insertPosts(p);
 		user.getMyList().add(p.getPostsIndex());
@@ -259,7 +303,7 @@ public class ServerConsole {
 			ArrayList<Integer> temp = user.getLikeList();
 
 			for (int i = 0; i < temp.size(); i++)
-				if (temp.get(i) == index)
+				if ((int)(temp.get(i)) == index)
 					temp.remove(i);
 
 			dbManager.updateUser(user);
@@ -270,7 +314,7 @@ public class ServerConsole {
 		}
 	}
 
-	public void like(String msg) {
+	public void like(String msg) throws Exception {
 		msg = msg.substring(6);
 		int index = Integer.parseInt(msg);
 
@@ -284,13 +328,13 @@ public class ServerConsole {
 		sendString("#fin");
 	}
 
-	public void dislike(String msg) {
+	public void dislike(String msg) throws Exception {
 		msg = msg.substring(9);
 		int index = Integer.parseInt(msg);
 		ArrayList<Integer> temp = user.getLikeList();
 
 		for (int i = 0; i < temp.size(); i++)
-			if (temp.get(i) == index)
+			if ((int)(temp.get(i)) == index)
 				temp.remove(i);
 
 		Posts posts = dbManager.getPostsByIndex(index);

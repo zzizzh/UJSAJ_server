@@ -1,12 +1,10 @@
 package com.example.myapplication.ProblemDomain;
 
+import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 
-/**
- * @author 안준영
- *
- */
 /**
  * @author 안준영
  *
@@ -19,6 +17,8 @@ public class User implements Serializable {
 	private String id, pw;
 	private ArrayList<Integer> likeList;
 	private ArrayList<Integer> myList;
+	private File Fimage;
+	private byte[] Iimage;
 
 	public User() {
 		this.index = 0;
@@ -26,6 +26,8 @@ public class User implements Serializable {
 		this.pw = null;
 		this.likeList = new ArrayList<Integer>();
 		this.myList = new ArrayList<Integer>();
+		this.Fimage = null;
+		this.Iimage = null;
 	}
 
 	public User(int index, String id, String pw) {
@@ -35,7 +37,9 @@ public class User implements Serializable {
 		this.pw = pw;
 		this.likeList = new ArrayList<Integer>();
 		this.myList = new ArrayList<Integer>();
-		
+		this.Fimage = null;
+		this.Iimage = null;
+
 	}
 
 	public String getId() {
@@ -87,15 +91,30 @@ public class User implements Serializable {
 	public void setUserLikeList(ArrayList<Integer> likeList) {
 		this.likeList = likeList;
 	}
-
 	public void setUserMyList(ArrayList<Integer> myList) {
 		this.myList = myList;
+	}
+
+	public File getFImage() {
+		return Fimage;
+	}
+
+	public void setFImage(File image) {
+		this.Fimage = image;
+	}
+
+	public byte[] getIImage() {
+		return Iimage;
+	}
+
+	public void setIImage(byte[] image) {
+		this.Iimage = image;
 	}
 
 	@Override
 	public String toString() {
 		return "User [index=" + index + ", id=" + id + ", pw=" + pw + ", likeList=" + likeList + ", myList=" + myList
-				+ "]";
+				+ ", Fimage=" + Fimage + ", Iimage=" + Arrays.toString(Iimage) + "]";
 	}
 
 }

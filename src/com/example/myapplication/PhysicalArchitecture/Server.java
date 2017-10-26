@@ -75,7 +75,7 @@ class EchoThread extends Thread {
 	public void run() { 
 		try { 
 			InetAddress inetaddr = sock.getInetAddress();
-			System.out.println(inetaddr.getHostAddress() + " �κ��� �����Ͽ����ϴ�.");
+			System.out.println(inetaddr.getHostAddress() + " 에서 접속 하였습니다.");
 			serverOutputStream = new ObjectOutputStream(sock.getOutputStream());
 			in = new ObjectInputStream(sock.getInputStream());
 			serverConsole = new ServerConsole(serverOutputStream);

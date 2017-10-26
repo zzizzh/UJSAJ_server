@@ -31,7 +31,7 @@ public class imageTest {
 
 			String newFileName = "jun";
 
-			File imageFile = new File("C:\\Users\\안준영\\Desktop\\DSC00565.jpg");
+			File imageFile = new File("C:\\Users\\안준영\\Desktop\\DB사진\\프로필사진\\DSC00565.jpg");
 
 			// create a "photo" namespace
 			GridFS gfsPhoto = new GridFS(db, "photo");

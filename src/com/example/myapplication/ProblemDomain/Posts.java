@@ -2,56 +2,53 @@ package com.example.myapplication.ProblemDomain;
 
 import java.io.File;
 import java.io.Serializable;
+import java.util.Arrays;
+
 public class Posts implements Serializable{
 
    private static final long serialVersionUID = 300L;
 
-   int index;
-   Location locationInfo;
-   String url;
-   String artist;
-   String song;
-   String comment;
+   private int postsID;
 
-   int userID;
-   int postsID;
-   int like;
+   private Location locationInfo;
+   private Music music;
+   private String comment;
 
-   long createTime;
-   File Fimage;
-   byte[] Iimage;
+   private int userID;
+   private int musicID;
+   private int like;
+
+   private String createTime;
+   private File Fimage;
+   private byte[] Iimage;
 
    public Posts(){
-      this.index = 0;
-      this.locationInfo = new Location();
-      this.url = null;
-      this.artist = null;
-      this.song = null;
+      this.musicID = 0;
       this.postsID = 0;
+      this.locationInfo = new Location();
+      this.music = null;
       this.like = 0;
-      this.createTime = 0;
+      this.createTime = "";
       this.Fimage = null;
       this.Iimage = null;
    }
 
    public Posts(int index){
-      this.index = index;
+      this.musicID = 0;
+      this.postsID = index;
       this.locationInfo = new Location();
-      this.url = null;
-      this.artist = null;
-      this.song = null;
-      this.postsID = 0;
+      this.music = null;
       this.like = 0;
-      this.createTime = 0;
+      this.createTime = "";
       this.Fimage = null;
       this.Iimage = null;
    }
 
    public int getPostsIndex(){
-      return index;
+      return postsID;
    }
-   public void setPostsIndex(int index){
-      this.index = index;
+   public void setPostsIndex(int postsID){
+      this.postsID = postsID;
    }
 
    public Location getLocationInfo() {
@@ -60,35 +57,18 @@ public class Posts implements Serializable{
    public void setLocationInfo(Location locationInfo) {
       this.locationInfo = locationInfo;
    }
-   public String getUrl() {
-      return url;
-   }
-   public void setUrl(String url) {
-      this.url = url;
-   }
-   public String getArtist() {
-      return artist;
-   }
-   public void setArtist(String artist) {
-      this.artist = artist;
-   }
-   public String getSong() {
-      return song;
-   }
-   public void setSong(String song) {
-      this.song = song;
-   }
+
    public String getComment() {
       return comment;
    }
    public void setComment(String comment) {
       this.comment = comment;
    }
-   public int getPostsID() {
-      return postsID;
+   public int getUserID() {
+      return userID;
    }
-   public void setPostsID(int postsID) {
-      this.postsID = postsID;
+   public void setUserID(int userID) {
+      this.userID = userID;
    }
    public int getLike() {
       return like;
@@ -96,15 +76,20 @@ public class Posts implements Serializable{
    public void setLike(int like) {
       this.like = like;
    }
-   public long getCreateTime() {
+   public String getCreateTime() {
       return createTime;
    }
-   public void setCreateTime(long createTime) {
+   public void setCreateTime(String createTime) {
       this.createTime = createTime;
    }
-
+   public void setMusic(Music music){
+      this.music = music;
+   }
+   public Music getMusic(){
+      return music;
+   }
    public String getFileName(){
-      return Integer.toString(index);
+      return Integer.toString(postsID);
    }
    public File getFImage(){
       return Fimage;
@@ -118,15 +103,24 @@ public class Posts implements Serializable{
    public void setIImage(byte[] image){
       this.Iimage = image;
    }
-
-   @Override
-   public String toString() {
-      return "Posts [index=" + index + ", locationInfo=" + locationInfo + ", url=" + url + ", artist=" + artist
-            + ", song=" + song + ", comment=" + comment + ", postsID=" + postsID + ", like=" + like
-            + ", createTime=" + createTime + ", Fimage=" + Fimage + ", Iimage=" + Iimage + "]";
-   }
-
    public byte[] getImage() {
       return Iimage;
    }
+
+   public int getMusicID() {
+      return musicID;
+   }
+
+   public void setMusicID(int musicID) {
+      this.musicID = musicID;
+   }
+
+   @Override
+   public String toString() {
+      return "Posts [postsID=" + postsID + ", locationInfo=" + locationInfo + ", music=" + music + ", comment=" + comment
+            + ", userID=" + userID + ", like=" + like + ", createTime=" + createTime + ", Fimage=" + Fimage
+            + ", Iimage=" + Arrays.toString(Iimage) + "]";
+   }
+
+
 }
