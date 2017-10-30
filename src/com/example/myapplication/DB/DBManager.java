@@ -58,7 +58,7 @@ public class DBManager {
 		
 		userCollection.createIndex("ID");
 		songCollection.createIndex("songID");
-		postsCollection.createIndex("index");
+		
 		// count all users in DB
 		userIndex = (int) userCollection.count() ;
 
@@ -87,32 +87,7 @@ public class DBManager {
 			if (dbIndex >= 7) {
 				for (int i = 0; i < 7; i++) {
 					Posts posts = getPostsByIndex(recentIndex);
-					/*
-					try {
-						File file = new File("C:\\Users\\안준영\\Desktop\\DB사진\\" + posts.getPostsIndex() + ".png");
-						InputStream is = new FileInputStream(file);
-						long length = file.length();
-
-						byte[] bytes = new byte[(int) length];
-						int offset = 0;
-						int numRead = 0;
-						while (offset < bytes.length
-								&& (numRead = is.read(bytes, offset, bytes.length - offset)) >= 0) {
-							offset += numRead;
-						}
-						posts.setIImage(bytes);
-						if (offset < bytes.length) {
-							throw new IOException("Could not completely read file " + file.getName());
-						}
-						is.close();
-
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
 					
-					// posts.setIImage(this.getImageByIndex(recentIndex));
-					 * 
-					 */
 					P.add(posts);
 					recentIndex--;
 				}
@@ -120,29 +95,7 @@ public class DBManager {
 			else{
 				for(int i=0;i<=dbIndex;i++){
 					Posts posts = getPostsByIndex(recentIndex);
-					/*
-					File file = new File("C:\\Users\\안준영\\Desktop\\DB사진\\" + posts.getPostsIndex() + ".png");
-					if(file != null){
-						
-						InputStream is = new FileInputStream(file);
-						long length = file.length();
-
-						byte[] bytes = new byte[(int) length];
-						int offset = 0;
-						int numRead = 0;
-						while (offset < bytes.length
-								&& (numRead = is.read(bytes, offset, bytes.length - offset)) >= 0) {
-							offset += numRead;
-						}
-						posts.setIImage(bytes);
-						if (offset < bytes.length) {
-							throw new IOException("Could not completely read file " + file.getName());
-						}
-						is.close();
-					} 
 					
-					posts.setIImage(this.getImageByIndex(recentIndex));
-					*/
 					P.add(posts);
 					recentIndex--;
 				}
@@ -451,7 +404,12 @@ public class DBManager {
 		document.put("postsID", postsIndex);
 		this.insertLocation(posts.getLocationInfo());
 		postsIndex++;
-		document.put("songID", posts.getMusic().getMusicId());
+		if(posts.getMusic() != null){
+			document.put("songID", posts.getMusic().getMusicId());
+		}
+		else{
+			document.put("songID", 0);
+		}
 		this.insertSong(posts.getMusic());
 		document.put("Comment", posts.getComment());
 		document.put("userID", posts.getUserID());
@@ -601,12 +559,17 @@ public class DBManager {
 					DBObject checkLoc = null;
 					checkLoc = cursorLoc.next();
 					if (checkLoc != null) {
+							
 						location.setBigLocation((String) checkLoc.get("BigLocation"));
 						location.setMidLocation((String) checkLoc.get("MidLocation"));
 						location.setSmallLocation((String) checkLoc.get("SmallLocation"));
 						location.setContentID((int) checkLoc.get("ContentID"));
 						location.setContentTypeID((int) checkLoc.get("ContentTypeID"));
 						location.setTitle((String) checkLoc.get("Title"));
+						location.setSubTitle((String) checkLoc.get("Addr"));
+						location.setFirstimage((String) checkLoc.get("Firstimage"));
+						location.setMapX((double) checkLoc.get("mapX"));
+						location.setMapY((double) checkLoc.get("mapY"));
 
 					}
 				}
@@ -651,7 +614,7 @@ public class DBManager {
 		GridFS gfsPhoto = new GridFS(db, "Image");
 
 		BasicDBObject idQuery = new BasicDBObject();
-		idQuery.put("index", index);
+		idQuery.put("postsID", index);
 
 		DBCursor cursorId = postsCollection.find(idQuery);
 
@@ -661,13 +624,12 @@ public class DBManager {
 			if (check != null) {
 
 				try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
-
+					
 					GridFSDBFile imageForOutput = gfsPhoto.findOne(Integer.toString(index));
 					if (imageForOutput == null) {
 						return null;
 					}
 					imageForOutput.writeTo(outputStream);
-
 					BufferedImage bimage;
 					Image newImage;
 
@@ -680,6 +642,7 @@ public class DBManager {
 					}
 
 					Iimage = outputStream.toByteArray();
+					System.out.println("Success!!!");
 					return Iimage;
 
 				} catch (IOException e) {
@@ -695,7 +658,6 @@ public class DBManager {
 	 * int bigLocation; int midLocation; int smallLocation; int contentID; int
 	 * contentTypeID; String title;
 	 */
-
 	public void insertLocation(Location location) {
 
 		BasicDBObject document = new BasicDBObject();
@@ -706,6 +668,10 @@ public class DBManager {
 		document.put("ContentID", location.getContentID());
 		document.put("ContentTypeID", location.getContentTypeID());
 		document.put("Title", location.getTitle());
+		document.put("addr", location.getSubTitle());
+		document.put("firstimage", location.getFirstimage());
+		document.put("mapX", location.getMapX());
+		document.put("mapY", location.getMapY());
 		// DB
 		locationCollection.insert(document);
 
@@ -828,5 +794,31 @@ public class DBManager {
 			p.add(posts);
 		}
 		return p;
+	}
+	public ArrayList<Posts> getPostsByLike() throws Exception {
+		ArrayList<Integer> i = new ArrayList<Integer>();
+		ArrayList<Posts> p = new ArrayList<Posts>();
+		DBCursor cursor = postsCollection.find();
+		
+		int size =(int) postsCollection.count() ;
+		
+		postsCollection.createIndex("Like");
+		
+		if (size < 10) {
+			for(int j = 0;j<size;j++){
+				int index = (int)cursor.next().get("index");
+				i.add(index);
+			}
+		} else {
+			for (int j = 0; j < 10; j++) {
+				int index = (int)cursor.next().get("index");
+				i.add(index);
+			}
+		}
+		for (int j = 0; j < i.size(); j++) {
+			Posts posts = this.getPostsByIndex(i.get(j));
+			p.add(posts);
+		}
+		return p;		
 	}
 }

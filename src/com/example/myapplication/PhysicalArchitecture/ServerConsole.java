@@ -202,7 +202,6 @@ public class ServerConsole {
 			if (i == 5)
 				break;
 			Posts posts = dbManager.getPostsByIndex((int)(temp.get(i)));
-			System.out.println(posts.toString());
 
 			p.addPosts(posts);
 			myCnt++;
@@ -278,7 +277,6 @@ public class ServerConsole {
 
 	public void post(Posts p) throws IOException {
 		p.setPostsIndex(dbManager.getPostsIndex());
-		p.setUserID(user.getUserIndex());
 		File fImage;
 		if(p.getIImage() != null){
 			ByteArrayInputStream inputStream = new ByteArrayInputStream(p.getIImage());

@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.util.Scanner;
 
 import com.example.myapplication.DB.DBManager;
+import com.example.myapplication.ProblemDomain.Music;
 import com.example.myapplication.ProblemDomain.Posts;
 
 public class test {
@@ -19,11 +20,13 @@ public class test {
 		//Posts p = new Posts();
 		//Location l = new Location();
 		
-		Posts p1 = new Posts(d.getPostsIndex());		
-		File image1 = new File("C:\\Users\\안준영\\Desktop\\DSC00565.jpg");
-		p1.setFImage(image1);
-		d.insertPosts(p1);
-		byte[] arr = d.getImageByIndex(22);
+		//Posts p1 = new Posts(d.getPostsIndex());
+		//Music m = new Music();
+		//p1.setMusic(m);
+		//File image1 = new File("C:\\Users\\안준영\\Desktop\\DSC00565.jpg");
+		//p1.setFImage(image1);
+		//d.insertPosts(p1);
+		byte[] arr = d.getImageByIndex(0);
 		System.out.println(arr);
 		FileOutputStream fos = new FileOutputStream("C:\\Users\\안준영\\Desktop\\DSC00565new.jpg");
 		fos.write(arr);
