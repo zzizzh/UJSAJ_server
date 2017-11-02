@@ -46,7 +46,7 @@ public class ServerConsole {
 		else if (msg.startsWith("#morePosts")) {
 			morePosts();
 		} else if (msg.startsWith("#refresh")) {
-			refresh();
+			refresh(msg);
 		} else if (msg.startsWith("#myLike")) {
 			myLike();
 		} else if (msg.startsWith("#moreLike")) {
@@ -100,9 +100,7 @@ public class ServerConsole {
 
 		else if (k == null) {// id가 없으면 회원가임
 
-			this.register(id, pass);
-			System.out.println("회원가입완료");
-			sendUser(user);
+			sendString("#err");
 		}
 		
 		else if (pass.compareTo(dbManager.getPWByID(id)) == 0) {//로그인성공
@@ -161,18 +159,57 @@ public class ServerConsole {
 			MailManager m = new MailManager(user);
 			sendString("#fin");
 		}
-				
-	}
-	public void refresh() {
-		try {
-			PostsList p = new PostsList(dbManager.refreshTimeLine());
 
-			System.out.println("postsList size : " + p.size());
-			System.out.println(p.toString());
-			sendPostsList(p);
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+	}
+
+	public void refresh(String msg) {
+		msg = msg.substring(9);
+		String[] token = msg.split("%");
+		String option = token[0];
+		int[] location = null;
+		int k = 1;
+		
+		if (option == "time") {
+			try {
+				PostsList p = new PostsList(dbManager.refreshTimeLine());
+
+				System.out.println("postsList size : " + p.size());
+				System.out.println(p.toString());
+				sendPostsList(p);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		else if(option == "like"){
+			try {
+				PostsList p = new PostsList(dbManager.getPostsByLike());
+
+				System.out.println("postsList size : " + p.size());
+				System.out.println(p.toString());
+				sendPostsList(p);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		else if(option == "distance"){
+			try {
+				while(token[k] == null){
+					location[k-1] =	Integer.parseInt(token[k]);
+				}
+				PostsList p = new PostsList(dbManager.getPostsByLocation(location));
+
+				System.out.println("postsList size : " + p.size());
+				System.out.println(p.toString());
+				sendPostsList(p);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		else{
+			sendString("#err");
 		}
 	}
 
@@ -209,7 +246,7 @@ public class ServerConsole {
 
 		System.out.println(p);
 		sendPostsList(p);
-	}
+	} 
 
 	public void moreMyPosts() throws Exception {
 		ArrayList<Integer> temp = user.getMyList();
@@ -379,6 +416,7 @@ public class ServerConsole {
 
 	private void sendPostsList(PostsList p) {
 		try {
+			System.out.println("Send postsLists...");
 			objOutput.writeObject(p);
 			System.out.println("sending postsList complete");
 		} catch (IOException e) {

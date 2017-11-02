@@ -84,10 +84,10 @@ public class DBManager {
 		int dbIndex = recentIndex;
 
 		if (dbIndex >= 0) {
-			if (dbIndex >= 7) {
+			if (dbIndex > 7) {
 				for (int i = 0; i < 7; i++) {
 					Posts posts = getPostsByIndex(recentIndex);
-					
+					System.out.println("Posts = " + recentIndex);
 					P.add(posts);
 					recentIndex--;
 				}
@@ -95,7 +95,7 @@ public class DBManager {
 			else{
 				for(int i=0;i<=dbIndex;i++){
 					Posts posts = getPostsByIndex(recentIndex);
-					
+					System.out.println("Posts = " + recentIndex);
 					P.add(posts);
 					recentIndex--;
 				}
@@ -103,7 +103,7 @@ public class DBManager {
 			
 		}
 		seeIndex = recentIndex;
-
+		System.out.println("return postsList");
 		return P;
 	}
 
@@ -612,46 +612,42 @@ public class DBManager {
 		Posts posts = new Posts();
 		byte[] Iimage;
 		GridFS gfsPhoto = new GridFS(db, "Image");
+		/*
+		 * BasicDBObject idQuery = new BasicDBObject(); idQuery.put("postsID",
+		 * index);
+		 * 
+		 * DBCursor cursorId = postsCollection.find(idQuery);
+		 * 
+		 * while (cursorId.hasNext()) { DBObject check = null; check =
+		 * cursorId.next(); if (check != null) {
+		 */
+		try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
 
-		BasicDBObject idQuery = new BasicDBObject();
-		idQuery.put("postsID", index);
-
-		DBCursor cursorId = postsCollection.find(idQuery);
-
-		while (cursorId.hasNext()) {
-			DBObject check = null;
-			check = cursorId.next();
-			if (check != null) {
-
-				try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
-					
-					GridFSDBFile imageForOutput = gfsPhoto.findOne(Integer.toString(index));
-					if (imageForOutput == null) {
-						return null;
-					}
-					imageForOutput.writeTo(outputStream);
-					BufferedImage bimage;
-					Image newImage;
-
-					ImageInputStream iis = ImageIO
-							.createImageInputStream(new ByteArrayInputStream(outputStream.toByteArray()));
-					Iterator<ImageReader> iter = ImageIO.getImageReaders(iis);
-					if (iter.hasNext()) {
-						ImageReader reader = (ImageReader) iter.next();
-						reader.setInput(iis);
-					}
-
-					Iimage = outputStream.toByteArray();
-					System.out.println("Success!!!");
-					return Iimage;
-
-				} catch (IOException e) {
-					throw new Exception("Cannot retrieve content of gridFsFile [" + index + "]", e);
-				}
-
+			GridFSDBFile imageForOutput = gfsPhoto.findOne(Integer.toString(index));
+			if (imageForOutput == null) {
+				return null;
 			}
+			imageForOutput.writeTo(outputStream);
+			BufferedImage bimage;
+			Image newImage;
+
+			ImageInputStream iis = ImageIO.createImageInputStream(new ByteArrayInputStream(outputStream.toByteArray()));
+			Iterator<ImageReader> iter = ImageIO.getImageReaders(iis);
+			if (iter.hasNext()) {
+				ImageReader reader = (ImageReader) iter.next();
+				reader.setInput(iis);
+			}
+
+			Iimage = outputStream.toByteArray();
+			System.out.println("Success!!!");
+			return Iimage;
+
+		} catch (IOException e) {
+			throw new Exception("Cannot retrieve content of gridFsFile [" + index + "]", e);
 		}
-		return null;
+		/*
+		 * } } return null;
+		 */
 	}
 
 	/*
@@ -677,20 +673,22 @@ public class DBManager {
 
 	}
 
-	public ArrayList<Posts> getPostsByLocation(Location location) throws Exception {
+	public ArrayList<Posts> getPostsByLocation(int[] location) throws Exception {
 
 		ArrayList<Integer> i = new ArrayList<Integer>();
 		ArrayList<Posts> p = new ArrayList<Posts>();
 
 		BasicDBObject cquery = new BasicDBObject();
+		for(int k=0;k<location.length;k++){
+			cquery.put("ContentID", location[k]);
 
-		cquery.put("ContentID", location.getContentID());
-
-		DBCursor ccursor = locationCollection.find(cquery);
-		while (ccursor.hasNext() && i.size() < 10) {
-			int index = (int) ccursor.next().get("index");
-			i.add(index);
+			DBCursor ccursor = locationCollection.find(cquery);
+			while (ccursor.hasNext() && i.size() < 10) {
+				int index = (int) ccursor.next().get("index");
+				i.add(index);
+			}
 		}
+		/*
 		if (i.size() < 10) {
 			BasicDBObject squery = new BasicDBObject();
 
@@ -729,7 +727,7 @@ public class DBManager {
 				int index = (int) bcursor.next().get("index");
 				i.add(index);
 			}
-		}
+		}*/
 		for (int j = 0; j < i.size(); j++) {
 			Posts posts = this.getPostsByIndex(i.get(j));
 			p.add(posts);
