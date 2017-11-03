@@ -8,6 +8,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 
 import com.example.myapplication.ProblemDomain.Posts;
+import com.example.myapplication.ProblemDomain.User;
 
 public class Server extends Thread// ����������Ŭ����
 {
@@ -104,7 +105,13 @@ class EchoThread extends Thread {
 					System.out.println("-----received Posts to server : " + temp.toString());
 					serverConsole.post((Posts)temp);
 				}
-				
+				else if(temp instanceof User){
+					System.out.println("-----received User to server : " + temp.toString());
+					serverConsole.updateUser((User)temp);
+				}
+				else{
+					System.out.println(temp);
+				}
 			}
 
 		} catch (Exception ex) {

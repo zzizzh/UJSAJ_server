@@ -5,6 +5,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import com.example.myapplication.DB.DBManager;
+
 /**
  * @author 안준영
  *
@@ -15,6 +17,7 @@ public class User implements Serializable {
 
 	private int index;
 	private String id, pw;
+	private int totalLike;
 	private ArrayList<Integer> likeList;
 	private ArrayList<Integer> myList;
 	private File Fimage;
@@ -24,6 +27,7 @@ public class User implements Serializable {
 		this.index = 0;
 		this.id = null;
 		this.pw = null;
+		this.totalLike = 0;
 		this.likeList = new ArrayList<Integer>();
 		this.myList = new ArrayList<Integer>();
 		this.Fimage = null;
@@ -35,13 +39,20 @@ public class User implements Serializable {
 		this.index = index;
 		this.id = id;
 		this.pw = pw;
+		this.totalLike = 0;
 		this.likeList = new ArrayList<Integer>();
 		this.myList = new ArrayList<Integer>();
 		this.Fimage = null;
 		this.Iimage = null;
 
 	}
+	public void setTotalLike(int totalLike){
+		this.totalLike = totalLike;
+	}
+	public int getTotalLike() throws Exception{
 
+		return totalLike;
+	}
 	public String getId() {
 		return id;
 	}
@@ -113,8 +124,7 @@ public class User implements Serializable {
 
 	@Override
 	public String toString() {
-		return "User [index=" + index + ", id=" + id + ", pw=" + pw + ", likeList=" + likeList + ", myList=" + myList
-				+ ", Fimage=" + Fimage + ", Iimage=" + Arrays.toString(Iimage) + "]";
+		return "User [index=" + index + ", id=" + id + ", pw=" + pw + ", likeList=" + likeList + ", myList=" + myList;
 	}
 
 }

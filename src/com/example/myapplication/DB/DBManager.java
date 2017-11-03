@@ -84,10 +84,9 @@ public class DBManager {
 		int dbIndex = recentIndex;
 
 		if (dbIndex >= 0) {
-			if (dbIndex > 7) {
-				for (int i = 0; i < 7; i++) {
+			if (dbIndex > 3) {
+				for (int i = 0; i < 3; i++) {
 					Posts posts = getPostsByIndex(recentIndex);
-					System.out.println("Posts = " + recentIndex);
 					P.add(posts);
 					recentIndex--;
 				}
@@ -95,7 +94,6 @@ public class DBManager {
 			else{
 				for(int i=0;i<=dbIndex;i++){
 					Posts posts = getPostsByIndex(recentIndex);
-					System.out.println("Posts = " + recentIndex);
 					P.add(posts);
 					recentIndex--;
 				}
@@ -113,7 +111,8 @@ public class DBManager {
 		ArrayList<Posts> p = new ArrayList<Posts>();
 
 		int k = seeIndex;
-		if (seeIndex < 7) {
+		System.out.println(seeIndex);
+		if (seeIndex < 3) {
 			for (; seeIndex >= 0; seeIndex--) {
 
 				Posts posts = this.getPostsByIndex(seeIndex);
@@ -127,8 +126,8 @@ public class DBManager {
 				p.add(posts);
 			}
 		} else {
-			for (; seeIndex > seeIndex - 5; seeIndex--) {
-
+			for (; seeIndex > k - 3; seeIndex--) {
+				System.out.println(seeIndex);
 				Posts posts = this.getPostsByIndex(seeIndex);
 				byte[] arr = this.getImageByIndex(seeIndex);
 				if (arr != null) {
@@ -145,7 +144,7 @@ public class DBManager {
 		return p;
 	}
 
-	public void insertUser(User user) {
+	public void insertUser(User user) throws Exception {
 
 		BasicDBObject document = new BasicDBObject();
 		// index
@@ -156,6 +155,7 @@ public class DBManager {
 		// PW
 		document.put("PW", user.getPw());
 		// LikeList
+		document.put("TotalLike", user.getTotalLike());
 		document.put("LikeList", user.getLikeList());
 		// MyList
 		document.put("MyList", user.getMyList());
@@ -194,6 +194,15 @@ public class DBManager {
 		}
 
 	}
+
+	public void updateUserImage(User user,File Fimage) {
+		DBObject document = new BasicDBObject();
+		document.put("filename", Integer.toString(user.getUserIndex()));
+		GridFS gfsPhoto = new GridFS(db, "UserImage");
+		gfsPhoto.remove(document);
+		
+		this.insertUserImage(user, Fimage);
+	}
 	public User getUserByIndex(int index) throws Exception {
 		User user = new User();
 
@@ -209,7 +218,7 @@ public class DBManager {
 				user.setUserIndex((Integer) check.get("index"));
 				user.setUserId((String) check.get("ID"));
 				user.setUserPw((String) check.get("PW"));
-				
+				user.setTotalLike((int) check.get("TotalLike"));
 				ArrayList<Integer> arrL1 = new ArrayList<Integer>();
 				ArrayList<Integer> arrL2 = new ArrayList<Integer>();
 				
@@ -312,13 +321,14 @@ public class DBManager {
 	}
 
 
-	public void updateUser(User user) {
+	public void updateUser(User user) throws Exception {
 
 		BasicDBObject updateQuery = new BasicDBObject();
 
 		updateQuery.put("index", user.getUserIndex());
 		updateQuery.put("ID", user.getId());
 		updateQuery.put("PW", user.getPw());
+		updateQuery.put("TotalLike", user.getTotalLike());
 		updateQuery.put("LikeList", user.getLikeList());
 		updateQuery.put("MyList", user.getMyList());
 
@@ -369,6 +379,7 @@ public class DBManager {
 				user.setUserIndex(n);
 				user.setUserId((String) check.get("ID"));
 				user.setUserPw((String) check.get("PW"));
+				user.setTotalLike((int) check.get("TotalLike"));
 				ArrayList<Integer> arrL1 = new ArrayList<Integer>();
 				ArrayList<Integer> arrL2 = new ArrayList<Integer>();
 				
@@ -491,18 +502,19 @@ public class DBManager {
 	
 	//
 	public void updatePostsList(Posts posts) {
-
+		//this.updateSong(posts.getMusic());
 		BasicDBObject updateQuery = new BasicDBObject();
-
-		updateQuery.put("postsID", posts.getPostsIndex());
 		
-		this.updateSong(posts.getMusic());
+		updateQuery.put("postsID", posts.getPostsIndex());
+		updateQuery.put("songID", posts.getMusicID());
+		
 		updateQuery.put("Comment", posts.getComment());
 		updateQuery.put("userID", posts.getUserID());
 		updateQuery.put("Like", posts.getLike());
+		System.out.println(posts.getLike());
 		updateQuery.put("CreateTime", posts.getCreateTime());
 
-		BasicDBObject searchQuery = new BasicDBObject().append("index", posts.getPostsIndex());
+		BasicDBObject searchQuery = new BasicDBObject().append("postsID", posts.getPostsIndex());
 		postsCollection.update(searchQuery, updateQuery);
 
 	}
@@ -639,7 +651,6 @@ public class DBManager {
 			}
 
 			Iimage = outputStream.toByteArray();
-			System.out.println("Success!!!");
 			return Iimage;
 
 		} catch (IOException e) {
@@ -673,13 +684,13 @@ public class DBManager {
 
 	}
 
-	public ArrayList<Posts> getPostsByLocation(int[] location) throws Exception {
+	public ArrayList<Posts> getPostsByLocation(int[] location,int size) throws Exception {
 
 		ArrayList<Integer> i = new ArrayList<Integer>();
 		ArrayList<Posts> p = new ArrayList<Posts>();
 
 		BasicDBObject cquery = new BasicDBObject();
-		for(int k=0;k<location.length;k++){
+		for(int k=0;k<size;k++){
 			cquery.put("ContentID", location[k]);
 
 			DBCursor ccursor = locationCollection.find(cquery);
@@ -729,6 +740,9 @@ public class DBManager {
 			}
 		}*/
 		for (int j = 0; j < i.size(); j++) {
+			if(j == 4){
+				break;
+			}
 			Posts posts = this.getPostsByIndex(i.get(j));
 			p.add(posts);
 		}
@@ -796,24 +810,29 @@ public class DBManager {
 	public ArrayList<Posts> getPostsByLike() throws Exception {
 		ArrayList<Integer> i = new ArrayList<Integer>();
 		ArrayList<Posts> p = new ArrayList<Posts>();
-		DBCursor cursor = postsCollection.find();
 		
+		//BasicDBObject query = new BasicDBObject();
+		//query.put("Like", "-1");
+		DBCursor cursor = postsCollection.find();
+		cursor.sort(new BasicDBObject("Like",-1));
+		
+		int k=0;
+		int dbindex = (int) postsCollection.count() ;
 		int size =(int) postsCollection.count() ;
 		
-		postsCollection.createIndex("Like");
 		
-		if (size < 10) {
-			for(int j = 0;j<size;j++){
-				int index = (int)cursor.next().get("index");
-				i.add(index);
+		while(cursor.hasNext()){
+			if(k == dbindex || k == 10){
+				break;
 			}
-		} else {
-			for (int j = 0; j < 10; j++) {
-				int index = (int)cursor.next().get("index");
-				i.add(index);
-			}
+			int index = (int) cursor.next().get("postsID");
+			i.add(index);
+			k++;
 		}
 		for (int j = 0; j < i.size(); j++) {
+			if(j == 3){
+				break;
+			}
 			Posts posts = this.getPostsByIndex(i.get(j));
 			p.add(posts);
 		}

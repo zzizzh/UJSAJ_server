@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 
 import javax.imageio.ImageIO;
 
@@ -49,7 +51,11 @@ public class ServerConsole {
 			refresh(msg);
 		} else if (msg.startsWith("#myLike")) {
 			myLike();
-		} else if (msg.startsWith("#moreLike")) {
+		}
+		else if (msg.startsWith("#totalLike")){
+			totalLike();
+		}
+		else if (msg.startsWith("#moreLike")) {
 			moreLike();
 		} else if (msg.startsWith("#post")) {
 			sendString("#ready");
@@ -57,15 +63,18 @@ public class ServerConsole {
 			delete(msg);
 		} else if (msg.startsWith("#like")) {
 			like(msg);
-		} else if (msg.startsWith("#delete")) {
+		} else if (msg.startsWith("#dislike")){
+			dislike(msg);
+		}else if(msg.startsWith("#getPostsLike")){
+			getPostsLike(msg);
+		}
+		else if (msg.startsWith("#delete")) {
 			delete(msg);
 		} else if (msg.startsWith("#myPosts")) {
 			myPosts();
 		} else if (msg.startsWith("#moreMyPosts")) {
 			moreMyPosts();
-		} else if (msg.startsWith("#updateUser")) {
-			updateUser();
-		}
+		} 
 	}
 
 	// ----------------function------------//
@@ -117,7 +126,7 @@ public class ServerConsole {
 
 	}
 
-	private void register(String msg) {
+	private void register(String msg) throws Exception {
 		msg = msg.substring(10);
 		String[] token = msg.split("%");
 		String id = token[0];
@@ -134,7 +143,7 @@ public class ServerConsole {
 		}
 	}
 
-	private void register(String id, String pw) {
+	private void register(String id, String pw) throws Exception {
 		if (dbManager.getPWByID(id) != null)
 			sendString("#err");
 
@@ -151,7 +160,8 @@ public class ServerConsole {
 		String[] token = msg.split("%");
 		String id = token[0];
 		
-		User user = dbManager.getUserByID(id);
+		User user = new User();
+		user = dbManager.getUserByID(id);
 		if(user == null){
 			sendString("#err");
 		}
@@ -161,17 +171,29 @@ public class ServerConsole {
 		}
 
 	}
-
+	public void totalLike() throws Exception{
+		int sum =0;
+		for(int i=0;i<user.getMyList().size();i++){
+			Posts p = dbManager.getPostsByIndex(user.getMyList().get(i));
+			sum += p.getLike();
+		}
+		user.setTotalLike(sum);
+		dbManager.updateUser(user);
+		sendString(Integer.toString(user.getTotalLike()));
+	}
 	public void refresh(String msg) {
+		PostsList p = new PostsList();
 		msg = msg.substring(9);
 		String[] token = msg.split("%");
-		String option = token[0];
-		int[] location = null;
-		int k = 1;
 		
-		if (option == "time") {
+		String option = token[0];
+		System.out.println(option);
+		int[] location = new int[100];
+		int k = 1;
+		boolean check = true;
+		if (option.compareTo("time") == 0) {
 			try {
-				PostsList p = new PostsList(dbManager.refreshTimeLine());
+				p = new PostsList(dbManager.refreshTimeLine());
 
 				System.out.println("postsList size : " + p.size());
 				System.out.println(p.toString());
@@ -181,9 +203,9 @@ public class ServerConsole {
 				e.printStackTrace();
 			}
 		}
-		else if(option == "like"){
+		else if(option.compareTo("like") == 0){
 			try {
-				PostsList p = new PostsList(dbManager.getPostsByLike());
+				p = new PostsList(dbManager.getPostsByLike());
 
 				System.out.println("postsList size : " + p.size());
 				System.out.println(p.toString());
@@ -193,24 +215,35 @@ public class ServerConsole {
 				e.printStackTrace();
 			}
 		}
-		else if(option == "distance"){
+		else if(option.compareTo("distance") == 0){
 			try {
-				while(token[k] == null){
-					location[k-1] =	Integer.parseInt(token[k]);
+				while(check){
+					try{
+						String t = token[k];
+						location[k-1] =	Integer.parseInt(token[k]);
+						k++;
+						}
+					
+					catch(Exception e){
+						check = false;
+					}
 				}
-				PostsList p = new PostsList(dbManager.getPostsByLocation(location));
-
-				System.out.println("postsList size : " + p.size());
-				System.out.println(p.toString());
-				sendPostsList(p);
+				p = new PostsList(dbManager.getPostsByLocation(location, k - 1));
+				if (p.size() == 0) {
+					sendString("#err");
+				} else {
+					System.out.println("postsList size : " + p.size());
+					System.out.println(p.toString());
+					sendPostsList(p);
+				}
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-		}
-		else{
+		} else {
 			sendString("#err");
 		}
+		System.out.println("Success send postsLists!");
 	}
 
 	public void morePosts() {
@@ -231,7 +264,9 @@ public class ServerConsole {
 
 		System.out.println(user.toString());
 		ArrayList<Integer> temp = user.getMyList();
-
+		
+		Descending descending = new Descending();
+		Collections.sort(temp,descending);
 		PostsList p = new PostsList();
 		System.out.println("temp size : " + temp.size());
 
@@ -239,7 +274,6 @@ public class ServerConsole {
 			if (i == 5)
 				break;
 			Posts posts = dbManager.getPostsByIndex((int)(temp.get(i)));
-
 			p.addPosts(posts);
 			myCnt++;
 		}
@@ -265,7 +299,7 @@ public class ServerConsole {
 	}
 
 	public void myLike() throws Exception {
-		likeCnt = 0;
+	 likeCnt = 0;
 
 		ArrayList<Integer> temp = user.getLikeList();
 
@@ -307,12 +341,13 @@ public class ServerConsole {
 			ImageIO.write(bufferedImage, "png",
 					(fImage = new File("C:\\Users\\안준영\\Desktop\\DB사진\\프로필사진\\" + user.getUserIndex() + ".png")));
 			user.setFImage(fImage);
+			dbManager.insertUserImage(user, fImage);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
-	public void post(Posts p) throws IOException {
+	public void post(Posts p) throws Exception {
 		p.setPostsIndex(dbManager.getPostsIndex());
 		File fImage;
 		if(p.getIImage() != null){
@@ -331,7 +366,7 @@ public class ServerConsole {
 		sendString("#fin");
 	}
 
-	public void delete(String msg) {
+	public void delete(String msg) throws Exception {
 		msg = msg.substring(8);
 		int index = Integer.parseInt(msg);
 		try {
@@ -357,10 +392,20 @@ public class ServerConsole {
 
 		Posts posts = dbManager.getPostsByIndex(index);
 		posts.setLike(posts.getLike() + 1);
+		System.out.println(posts.getLike());
 		dbManager.updatePostsList(posts);
 		dbManager.updateUser(user);
 		System.out.println("updateSuccess!");
-		sendString("#fin");
+		sendUser(user);
+	}
+	
+	public void getPostsLike(String msg) throws Exception {
+		msg = msg.substring(14);
+		int index = Integer.parseInt(msg);
+
+		Posts posts = dbManager.getPostsByIndex(index);
+		
+		sendString(Integer.toString(posts.getLike()));
 	}
 
 	public void dislike(String msg) throws Exception {
@@ -386,9 +431,23 @@ public class ServerConsole {
 	/*
 	 * request for updating user data in android
 	 */
-	public void updateUser() {
-		sendUser(user);
-		System.out.println(user.toString());
+	public void updateUser(User user) throws Exception {
+
+		File fImage;
+		try {
+			ByteArrayInputStream inputStream = new ByteArrayInputStream(user.getIImage());
+			BufferedImage bufferedImage = ImageIO.read(inputStream);
+
+			ImageIO.write(bufferedImage, "png",
+					(fImage = new File("C:\\Users\\안준영\\Desktop\\DB사진\\프로필사진\\" + user.getUserIndex() + ".png")));
+			user.setFImage(fImage);
+			dbManager.updateUserImage(user, fImage);
+			dbManager.updateUser(user);
+			System.out.println(user);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
 	}
 
 	// ------------------send---------------//
@@ -422,6 +481,11 @@ public class ServerConsole {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		}
+	}
+	class Descending implements Comparator<Integer>{
+		public int compare(Integer o1,Integer o2){
+			return o2.compareTo(o1);
 		}
 	}
 }

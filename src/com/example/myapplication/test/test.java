@@ -1,13 +1,13 @@
 
 package com.example.myapplication.test;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.util.Scanner;
 
 import com.example.myapplication.DB.DBManager;
+import com.example.myapplication.ProblemDomain.Location;
 import com.example.myapplication.ProblemDomain.Music;
 import com.example.myapplication.ProblemDomain.Posts;
+import com.example.myapplication.ProblemDomain.User;
 
 public class test {
 
@@ -16,8 +16,15 @@ public class test {
 		DBManager d = new DBManager();
 
 		Scanner keyboard = new Scanner(System.in);
-		
-		//Posts p = new Posts();
+		User user = new User();
+		Posts p = new Posts();
+		p.setIImage(d.getImageByIndex(1));
+		System.out.println(p.getIImage());
+		Music m = new Music();
+		Location l = new Location();
+		p.setMusic(m);
+		p.setLocationInfo(l);
+		d.insertPosts(p);
 		//Location l = new Location();
 		
 		//Posts p1 = new Posts(d.getPostsIndex());
@@ -26,11 +33,11 @@ public class test {
 		//File image1 = new File("C:\\Users\\안준영\\Desktop\\DSC00565.jpg");
 		//p1.setFImage(image1);
 		//d.insertPosts(p1);
-		byte[] arr = d.getImageByIndex(0);
-		System.out.println(arr);
-		FileOutputStream fos = new FileOutputStream("C:\\Users\\안준영\\Desktop\\DSC00565new.jpg");
-		fos.write(arr);
-		fos.close();
+		//byte[] arr = d.getImageByIndex(0);
+		//System.out.println(arr);
+		//FileOutputStream fos = new FileOutputStream("C:\\Users\\안준영\\Desktop\\DSC00565new.jpg");
+		//fos.write(arr);
+		//fos.close();
 	/*	
 		l.setBigLocation(1234567890);
 		l.setMidLocation(1234567890);
